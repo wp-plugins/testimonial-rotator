@@ -39,7 +39,8 @@ When you are adding or editing the rotator, you have the ability to specify how 
 2. Adding a Testimonial Rotator
 3. Add a new Testimonial. Uses built-in WordPress functionality like excerpt, featured images and menu order
 4. A Testimonial Rotator inserted into a block of text with a shortcode
-5. Testimonial widget also included and uses just the excerpt to display the best part of the testimonial
+5. Testimonials have their own page and use the single template.
+6. Testimonial widget also included and uses just the excerpt to display the best part of the testimonial
 
 == Changelog ==
 
