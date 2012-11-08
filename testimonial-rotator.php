@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: Testimonial Rotator for Developers
+Plugin Name: Testimonial Rotator
 Plugin URI: http://halgatewood.com/testimonial-rotator
 Description: A handy plugin for WordPress developers to add testimonials to their site. Enough functionality to be helpful and also stays out of your way.
 Author: Hal Gatewood
