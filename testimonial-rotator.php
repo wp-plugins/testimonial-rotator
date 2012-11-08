@@ -7,7 +7,7 @@ Author: Hal Gatewood
 Author URI: http://www.halgatewood.com
 Text Domain: testimonial_rotator
 Domain Path: /languages
-Version: 1.0
+Version: 1.1
 */
 
 /*
@@ -460,7 +460,7 @@ class TestimonialRotatorWidget extends WP_Widget
 			$rtn .= "<script> 
 						jQuery(document).ready(function() 
 						{  
-							jQuery('#testimonial_rotator_widget_{$id}').cycle( { fx : 'fade', timeout: " . apply_filters( 'testimonial_rotator_widget_timeout', 4000 ) . ", speed: " . apply_filters( 'testimonial_rotator_widget_speed', 750 ) . ", pause: true, before: function() { jQuery(this).parent().animate({height: jQuery(this).height() }); } } );   
+							jQuery('#testimonial_rotator_widget_{$id}').cycle( { fit: true, fx : 'fade', timeout: " . apply_filters( 'testimonial_rotator_widget_timeout', 4000 ) . ", speed: " . apply_filters( 'testimonial_rotator_widget_speed', 750 ) . ", pause: true, before: function() { jQuery(this).parent().animate({height: jQuery(this).height() }); } } );   
 						}); 
 					</script> ";		
 			echo $rtn;
