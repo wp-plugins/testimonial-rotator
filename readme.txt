@@ -44,6 +44,9 @@ When you are adding or editing the rotator, you have the ability to specify how 
 
 == Changelog ==
 
+= 1.1 =
+* Small fix to make the testimonial widget fit it's container
+
 = 1.0 =
 * Initial load of the plugin.
 
