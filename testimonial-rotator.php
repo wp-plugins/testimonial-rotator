@@ -7,7 +7,7 @@ Author: Hal Gatewood
 Author URI: http://www.halgatewood.com
 Text Domain: testimonial_rotator
 Domain Path: /languages
-Version: 1.1
+Version: 1.1.1
 */
 
 /*
@@ -382,10 +382,10 @@ function testimonial_rotator($atts)
 		$rtn .= "</div>\n</div>\n\n";
 		
 		$rtn .= "<script> 
-					jQuery(document).ready(function() 
-					{  
+					window.onload = function(e)
+					{ 
 						jQuery('#testimonial_rotator_{$id}').cycle( { fx : '{$fx}', timeout: {$timeout}, speed: 750, pause: true, before: function() { jQuery(this).parent().animate({height: jQuery(this).height() }); } } );   
-					}); 
+					}; 
 				</script> ";
 		
 		return $rtn;
@@ -458,10 +458,10 @@ class TestimonialRotatorWidget extends WP_Widget
 			
 			$rtn .= "</div>\n</div>\n\n";
 			$rtn .= "<script> 
-						jQuery(document).ready(function() 
-						{  
+						window.onload = function(e)
+						{ 
 							jQuery('#testimonial_rotator_widget_{$id}').cycle( { fit: true, fx : 'fade', timeout: " . apply_filters( 'testimonial_rotator_widget_timeout', 4000 ) . ", speed: " . apply_filters( 'testimonial_rotator_widget_speed', 750 ) . ", pause: true, before: function() { jQuery(this).parent().animate({height: jQuery(this).height() }); } } );   
-						}); 
+						};
 					</script> ";		
 			echo $rtn;
 		}
