@@ -44,6 +44,10 @@ When you are adding or editing the rotator, you have the ability to specify how 
 
 == Changelog ==
 
+
+= 1.1.5 =
+* small bug in widget javascript
+
 = 1.1.4 =
 * reworking loading of scripts for rotator, should be sorted now.
 
