@@ -43,6 +43,10 @@ When you are adding or editing the rotator, you have the ability to specify how 
 6. Testimonial widget also included and uses just the excerpt to display the best part of the testimonial
 
 == Changelog ==
+
+= 1.1.3 =
+* jQuery ready function always
+
 = 1.1.2 =
 * Testimonial widget using jQuery ready function instead of window.onload
 
