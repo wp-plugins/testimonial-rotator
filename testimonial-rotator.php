@@ -7,7 +7,7 @@ Author: Hal Gatewood
 Author URI: http://www.halgatewood.com
 Text Domain: testimonial_rotator
 Domain Path: /languages
-Version: 1.1.3
+Version: 1.1.4
 */
 
 /*
