@@ -1,0 +1,209 @@
+# Copyright (C) 2012 Testimonial Rotator
+# This file is distributed under the same license as the Testimonial Rotator package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Testimonial Rotator 1.1\n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/testimonial-rotator\n"
+"POT-Creation-Date: 2012-11-08 18:04:08+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2012-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+
+#: testimonial-rotator.php:72 testimonial-rotator.php:84
+#: testimonial-rotator.php:232
+msgid "Testimonials"
+msgstr ""
+
+#: testimonial-rotator.php:73
+msgid "Testimonial"
+msgstr ""
+
+#: testimonial-rotator.php:74 testimonial-rotator.php:108
+msgid "Add New"
+msgstr ""
+
+#: testimonial-rotator.php:75
+msgid "Add New Testimonial"
+msgstr ""
+
+#: testimonial-rotator.php:76
+msgid "Edit Testimonial"
+msgstr ""
+
+#: testimonial-rotator.php:77
+msgid "New Testimonial"
+msgstr ""
+
+#: testimonial-rotator.php:78
+msgid "All Testimonials"
+msgstr ""
+
+#: testimonial-rotator.php:79
+msgid "View Testimonial"
+msgstr ""
+
+#: testimonial-rotator.php:80
+msgid "Search Testimonials"
+msgstr ""
+
+#: testimonial-rotator.php:81
+msgid "No testimonials found"
+msgstr ""
+
+#: testimonial-rotator.php:82
+msgid "No testimonials found in Trash"
+msgstr ""
+
+#: testimonial-rotator.php:106
+msgid "Testimonial Rotators"
+msgstr ""
+
+#: testimonial-rotator.php:107 testimonial-rotator.php:272
+#: testimonial-rotator.php:283
+msgid "Rotator"
+msgstr ""
+
+#: testimonial-rotator.php:109
+msgid "Add New Rotator"
+msgstr ""
+
+#: testimonial-rotator.php:110
+msgid "Edit Rotator"
+msgstr ""
+
+#: testimonial-rotator.php:111
+msgid "New Rotator"
+msgstr ""
+
+#: testimonial-rotator.php:112
+msgid "All Rotators"
+msgstr ""
+
+#: testimonial-rotator.php:113
+msgid "View Rotator"
+msgstr ""
+
+#: testimonial-rotator.php:114
+msgid "Search Rotators"
+msgstr ""
+
+#: testimonial-rotator.php:115
+msgid "No rotators found"
+msgstr ""
+
+#: testimonial-rotator.php:116
+msgid "No rotators found in Trash"
+msgstr ""
+
+#: testimonial-rotator.php:118 testimonial-rotator.php:235
+msgid "Rotators"
+msgstr ""
+
+#: testimonial-rotator.php:145
+msgid "Testimonial Options"
+msgstr ""
+
+#: testimonial-rotator.php:148
+msgid "Testimonial Image"
+msgstr ""
+
+#: testimonial-rotator.php:151
+msgid "Testimonial Order"
+msgstr ""
+
+#: testimonial-rotator.php:156
+msgid "Rotator Shortcode"
+msgstr ""
+
+#: testimonial-rotator.php:160
+msgid "Rotator Options"
+msgstr ""
+
+#: testimonial-rotator.php:175
+msgid "No Testimonial Rotators have been created."
+msgstr ""
+
+#: testimonial-rotator.php:176
+msgid ""
+"You need to publish this testimonial so you don't lose your work and then go "
+"create a Testimonial Rotator. You can then edit this testimonial and select "
+"the rotator here."
+msgstr ""
+
+#: testimonial-rotator.php:180
+msgid "Attach to Rotator: "
+msgstr ""
+
+#: testimonial-rotator.php:196
+msgid "Put the code above wherever you want to show this rotator"
+msgstr ""
+
+#: testimonial-rotator.php:213
+msgid "Seconds per Testimonial:"
+msgstr ""
+
+#: testimonial-rotator.php:217
+msgid "Transition Effect:"
+msgstr ""
+
+#: testimonial-rotator.php:233
+msgid "Add Testimonial"
+msgstr ""
+
+#: testimonial-rotator.php:236
+msgid "Add Rotator"
+msgstr ""
+
+#: testimonial-rotator.php:270
+msgid "Image"
+msgstr ""
+
+#: testimonial-rotator.php:271 testimonial-rotator.php:282
+#: testimonial-rotator.php:301
+msgid "Title"
+msgstr ""
+
+#: testimonial-rotator.php:273
+msgid "Order"
+msgstr ""
+
+#: testimonial-rotator.php:274 testimonial-rotator.php:284
+msgid "Date"
+msgstr ""
+
+#: testimonial-rotator.php:302
+msgid "Shortcode"
+msgstr ""
+
+#: testimonial-rotator.php:403
+msgid "Displays rotating testimonials"
+msgstr ""
+
+#: testimonial-rotator.php:404
+msgid "Testimonials Rotator"
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+msgid "Testimonial Rotator"
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+msgid "http://halgatewood.com/testimonial-rotator"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid ""
+"A handy plugin for WordPress developers to add testimonials to their site. "
+"Enough functionality to be helpful and also stays out of your way."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "Hal Gatewood"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "http://www.halgatewood.com"
+msgstr ""
