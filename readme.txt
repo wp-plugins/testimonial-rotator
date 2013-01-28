@@ -44,6 +44,9 @@ When you are adding or editing the rotator, you have the ability to specify how 
 
 == Changelog ==
 
+= 1.1.4 =
+* reworking loading of scripts for rotator, should be sorted now.
+
 = 1.1.3 =
 * jQuery ready function always
 

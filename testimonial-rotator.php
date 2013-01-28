@@ -7,7 +7,7 @@ Author: Hal Gatewood
 Author URI: http://www.halgatewood.com
 Text Domain: testimonial_rotator
 Domain Path: /languages
-Version: 1.1.3
+Version: 1.1.4
 */
 
 /*
@@ -52,6 +52,14 @@ function testimonial_rotator_setup()
 	add_action( 'admin_menu', 'register_testimonial_rotator_submenu_page');
 
 	add_action( 'widgets_init', create_function('', 'return register_widget("TestimonialRotatorWidget");') );
+	
+	add_action('wp_head', 'testimonial_rotator_wp_head', 1);
+}
+
+function testimonial_rotator_wp_head()
+{
+	wp_enqueue_script( 'cycle', plugins_url('/jquery.cycle.all.js', __FILE__), array('jquery'));
+	wp_enqueue_style( 'testimonial-rotator-style', plugins_url('/testimonial-rotator-style.css', __FILE__)); 
 }
 
 
@@ -353,10 +361,7 @@ function testimonial_rotator($atts)
 
 	if ( $testimonials->have_posts() )
 	{
-		wp_enqueue_script('jquery');
-		wp_enqueue_script( 'cycle', plugins_url('/jquery.cycle.all.js', __FILE__), array('jquery'));
-		wp_enqueue_style( 'testimonial-rotator-style', plugins_url('/testimonial-rotator-style.css', __FILE__)); 
-		
+	
 		$rtn = "<div class=\"testimonial_rotator_wrap\">\n";
 		$rtn .= "	<div id=\"testimonial_rotator_{$id}\" class=\"testimonial_rotator\">\n";
 		
@@ -435,10 +440,6 @@ class TestimonialRotatorWidget extends WP_Widget
 		
 		if ( $testimonials->have_posts() )
 		{
-			wp_enqueue_script('jquery');
-			wp_enqueue_script( 'cycle', plugins_url('/jquery.cycle.all.js', __FILE__), array('jquery'));
-			wp_enqueue_style( 'testimonial-rotator-style', plugins_url('/testimonial-rotator-style.css', __FILE__)); 
-			
 			$rtn = "<div class=\"testimonial_rotator_widget_wrap\">\n";
 			$rtn .= "	<div id=\"testimonial_rotator_widget_{$id}\" class=\"testimonial_rotator_widget\">\n";
 			
