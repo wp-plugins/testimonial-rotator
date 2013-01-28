@@ -7,7 +7,7 @@ Author: Hal Gatewood
 Author URI: http://www.halgatewood.com
 Text Domain: testimonial_rotator
 Domain Path: /languages
-Version: 1.1.2
+Version: 1.1.3
 */
 
 /*
@@ -353,6 +353,7 @@ function testimonial_rotator($atts)
 
 	if ( $testimonials->have_posts() )
 	{
+		wp_enqueue_script('jquery');
 		wp_enqueue_script( 'cycle', plugins_url('/jquery.cycle.all.js', __FILE__), array('jquery'));
 		wp_enqueue_style( 'testimonial-rotator-style', plugins_url('/testimonial-rotator-style.css', __FILE__)); 
 		
@@ -434,6 +435,7 @@ class TestimonialRotatorWidget extends WP_Widget
 		
 		if ( $testimonials->have_posts() )
 		{
+			wp_enqueue_script('jquery');
 			wp_enqueue_script( 'cycle', plugins_url('/jquery.cycle.all.js', __FILE__), array('jquery'));
 			wp_enqueue_style( 'testimonial-rotator-style', plugins_url('/testimonial-rotator-style.css', __FILE__)); 
 			
@@ -458,11 +460,11 @@ class TestimonialRotatorWidget extends WP_Widget
 			
 			$rtn .= "</div>\n</div>\n\n";
 			$rtn .= "<script> 
-						window.onload = function(e)
-						{ 
-							jQuery('#testimonial_rotator_widget_{$id}').cycle( { fit: true, fx : 'fade', timeout: " . apply_filters( 'testimonial_rotator_widget_timeout', 4000 ) . ", speed: " . apply_filters( 'testimonial_rotator_widget_speed', 750 ) . ", pause: true, before: function() { jQuery(this).parent().animate({height: jQuery(this).height() }); } } );   
-						};
-					</script> ";		
+					jQuery(document).ready(function()
+					{
+						jQuery('#testimonial_rotator_{$id}').cycle( { fx : '{$fx}', timeout: {$timeout}, speed: 750, pause: true, before: function() { jQuery(this).parent().animate({height: jQuery(this).height() }); } } );   
+					}); 
+				</script> ";		
 			echo $rtn;
 		}
 		
