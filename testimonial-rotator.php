@@ -7,7 +7,7 @@ Author: Hal Gatewood
 Author URI: http://www.halgatewood.com
 Text Domain: testimonial_rotator
 Domain Path: /languages
-Version: 1.1.5
+Version: 1.2
 */
 
 /*
@@ -349,19 +349,29 @@ function testimonial_rotator_shortcode($atts)
 /* MEAT & POTATOES OF THE ROTATOR */
 function testimonial_rotator($atts)
 {
-	$id 			= isset($atts['id']) ? $atts['id'] : "";
+	$id 				= isset($atts['id']) ? $atts['id'] : "";
+	$show_title 		= isset($atts['hide_title']) ? false : true;
+	$format				= isset($atts['format']) ? $atts['format'] : "rotator";
+	$post_count			= isset($atts['limit']) ? (int) $atts['limit'] : -1;
 
 	$timeout		= (int) get_post_meta( $id, '_timeout', true );
 	$timeout 		= round($timeout * 1000);
 	$fx				= get_post_meta( $id, '_fx', true );
+	
+	// IF ID IS NOT NUMERIC CHECK FOR SLUG
+	if(!is_numeric($id))
+	{
+		$rotator = get_page_by_path( $id, null, 'testimonial_rotator' );
+		if(!$rotator) return;
+		$id = $rotator->ID;
+	}
 
-	$testimonials_args = array( 'post_type' => 'testimonial', 'order' => 'ASC', 'orderby' => 'menu_order', 'meta_key' => '_rotator_id', 'meta_value' => $id  );
+	$testimonials_args = array( 'post_type' => 'testimonial', 'order' => 'ASC', 'orderby' => 'menu_order', 'meta_key' => '_rotator_id', 'meta_value' => $id, 'posts_per_page' => $post_count );
 
 	$testimonials = new WP_Query( apply_filters( 'testimonial_rotator_display_args', $testimonials_args ) );
 
 	if ( $testimonials->have_posts() )
 	{
-	
 		$rtn = "<div class=\"testimonial_rotator_wrap\">\n";
 		$rtn .= "	<div id=\"testimonial_rotator_{$id}\" class=\"testimonial_rotator\">\n";
 		
@@ -372,12 +382,14 @@ function testimonial_rotator($atts)
 			$testimonials->the_post();
 				
 			$slide = "<div class=\"slide\">\n";		
-			$slide .= "	<h2>" . get_the_title() . "</h2>\n";
+			
+			if($show_title) $slide .= "	<h2>" . get_the_title() . "</h2>\n";
+			
 			if ( has_post_thumbnail() )
 			{ 
 				$slide .= "	<div class=\"img\">" . get_the_post_thumbnail( get_the_ID(), 'thumbnail') . "</div>\n"; 
 			}
-			$slide .= "	<div class=\"text\">" . get_the_content() . "</div>\n";
+			$slide .= "	<div class=\"text\">" . apply_filters( 'the_content', get_the_content() ) . "</div>\n";
 			$slide .= "</div>\n";
 
 			$rtn .= apply_filters( 'testimonial_rotator_slide', $slide );
@@ -387,12 +399,15 @@ function testimonial_rotator($atts)
 		
 		$rtn .= "</div>\n</div>\n\n";
 		
-		$rtn .= "<script> 
-					jQuery(document).ready(function()
-					{
-						jQuery('#testimonial_rotator_{$id}').cycle( { fx : '{$fx}', timeout: {$timeout}, speed: 750, pause: true, before: function() { jQuery(this).parent().animate({height: jQuery(this).height() }); } } );   
-					}); 
-				</script> ";
+		if($format == "rotator")
+		{
+			$rtn .= "<script> 
+						jQuery(document).ready(function()
+						{
+							jQuery('#testimonial_rotator_{$id}').cycle( { fx : '{$fx}', timeout: {$timeout}, speed: 750, pause: true, before: function() { jQuery(this).parent().animate({height: jQuery(this).height() }); } } );   
+						}); 
+					</script> ";		
+		}
 		
 		return $rtn;
 	}
@@ -486,11 +501,6 @@ function testimonial_rotator_cpt_icon()
 		#menu-posts-testimonial .wp-menu-image { background: url(<?php echo TESTIMONIAL_ROTATOR_URI . '/thumb-up.png'; ?>) no-repeat 6px -17px !important; }
 		#menu-posts-testimonial:hover .wp-menu-image, #menu-posts-testimonial.wp-has-current-submenu .wp-menu-image { background-position: 6px 7px!important; }	
 	</style>
-<?php }
-
-
-
-
-
-
+<?php 
+}
 ?>

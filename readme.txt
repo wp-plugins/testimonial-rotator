@@ -42,8 +42,16 @@ When you are adding or editing the rotator, you have the ability to specify how 
 5. Testimonials have their own page and use the single template.
 6. Testimonial widget also included and uses just the excerpt to display the best part of the testimonial
 
+
 == Changelog ==
 
+= 1.2 =
+* main testimonial now uses the_content filter to make styling better.
+* include rotator using the rotator slug, for example: [testimonial_rotator id=homepage]
+* new attributes to the shortcode: 
+** hide_title: hides the h2 heading
+** format: settings format=list will remove rotator and display all testimonials
+** limit: set the number of testimonials to display, new default is -1 or all testimonials
 
 = 1.1.5 =
 * small bug in widget javascript
