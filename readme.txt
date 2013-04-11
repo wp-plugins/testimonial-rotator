@@ -16,6 +16,10 @@ This plugin creates a testimonial and a testimonial rotator custom post type, co
 
 It's designed for developers and their clients by using minimal CSS and several filters to customize it's output.
 
+Example shortcode with all attributes:
+
+`[testimonial_rotator id=359 hide_title=true format=list limit=25]`
+
 == Installation ==
 
 1. Add plugin to the `/wp-content/plugins/` directory
