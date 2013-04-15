@@ -14,9 +14,10 @@ Easily add Testimonials to your WordPress Blog or Company Website.
 
 This plugin creates a testimonial and a testimonial rotator custom post type, complete with WordPress admin fields for adding testimonials and assigning them to rotators for display. It includes a Widget and Shortcode to display the testimonials.
 
-It's designed for developers and their clients by using minimal CSS and several filters to customize it's output.
+It's designed with minimal CSS so it will blend with your theme.
 
-Example shortcode with all attributes:
+
+Shortcode examples:
 
 `[testimonial_rotator id=407] or [testimonial_rotator id=rotator_slug]
 
@@ -31,6 +32,52 @@ Hide Titles
 
 Randomize Testimonials
 [testimonial_rotator id=rotator_slug shuffle=true]`
+
+
+Example Testimonial HTML:
+
+`
+<div class="testimonial_rotator_wrap">
+	<div id="testimonial_rotator_359" class="testimonial_rotator">
+		<div class="slide">
+			<h2>Post Title</h2>
+			<div class="img">Featured Image</div>
+			<div class="text"><p>Testimonial Content</p></div>
+		</div>
+		<div class="slide">
+			<h2>Post Title</h2>
+			<div class="img">Featured Image</div>
+			<div class="text"><p>Testimonial Content</p></div>
+		</div>
+	</div>
+</div>
+`
+
+
+Example Widget HTML:
+
+`
+<h3 class="widget-title">Widget Title</h3>
+
+<div class="testimonial_rotator_widget_wrap">
+	<div id="testimonial_rotator_widget_sidebar-1" class="testimonial_rotator_widget">
+		<div class="slide">
+			<blockquote>
+				<p>Content</p>
+				<cite>- Post Title</cite>	
+			</blockquote>
+		</div>
+		<div class="slide">
+			<blockquote>
+				<p>Content</p>
+				<cite>- Post Title</cite>	
+			</blockquote>
+		</div>
+	</div>
+</div>
+`
+
+
 
 == Installation ==
 
