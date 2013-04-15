@@ -45,9 +45,17 @@ When you are adding or editing the rotator, you have the ability to specify how 
 4. A Testimonial Rotator inserted into a block of text with a shortcode
 5. Testimonials have their own page and use the single template.
 6. Testimonial widget also included and uses just the excerpt to display the best part of the testimonial
-
+7. New Widget Options (version 1.3+)
 
 == Changelog ==
+
+= 1.3 =
+* Randomize testimonials without code
+* Hide the title
+* Display excerpt or full testimonial in width
+* Display specific rotator in widget
+* More shortcode examples
+* The widget has been updated with all the features as options, no more coding!
 
 = 1.2 =
 * main testimonial now uses the_content filter to make styling better.

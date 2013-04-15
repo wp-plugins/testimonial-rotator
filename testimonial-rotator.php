@@ -7,7 +7,7 @@ Author: Hal Gatewood
 Author URI: http://www.halgatewood.com
 Text Domain: testimonial_rotator
 Domain Path: /languages
-Version: 1.2
+Version: 1.3
 */
 
 /*
@@ -200,8 +200,25 @@ function testimonial_rotator_metabox_select()
 function testimonial_rotator_shortcode_metabox()
 {
 	global $post;
-	echo "<p>[testimonial_rotator id=" . $post->ID . "]</p>";
-	echo '<span class="description">' . __('Put the code above wherever you want to show this rotator', 'testimonial_rotator') . '</span>';	
+	
+	echo '
+		<b>Base Rotator</b><br />
+		[testimonial_rotator id=' . $post->ID . '] or [testimonial_rotator id=' . $post->post_name . ']<br /><br />
+		
+		<b>List All Testimonials</b><br />
+		[testimonial_rotator id=' . $post->ID . ' format=list]<br /><br />
+		
+		<b>Limit Results to 10</b><br />
+		[testimonial_rotator id=' . $post->post_name . ' format=list limit=10]<br /><br />
+			
+		<b>Hide Titles</b><br />
+		[testimonial_rotator id=' . $post->post_name . ' hide_title=true]<br /><br />
+		
+		<b>Randomize Testimonials</b><br />
+		[testimonial_rotator id=' . $post->post_name . ' shuffle=true]<br /><br />	
+	';
+	
+	echo '<span class="description">' . __('Put one of the above codes wherever you want the testimonials to appear', 'testimonial_rotator') . '</span>';	
 }
 
 
@@ -305,9 +322,10 @@ function testimonial_rotator_add_columns( $column )
 function testimonial_rotator_rotator_columns( $columns ) 
 {
 	$columns = array(
-		'cb'       => '<input type="checkbox" />',
-		'title'    => __('Title', 'testimonial_rotator'),
-		'shortcode'=> __('Shortcode', 'testimonial_rotator')
+		'cb'       		=> '<input type="checkbox" />',
+		'title'    		=> __('Title', 'testimonial_rotator'),
+		'slug'    		=> __('Slug', 'testimonial_rotator'),
+		'shortcode'		=> __('Shortcodes', 'testimonial_rotator')
 	);
 
 	return $columns;
@@ -316,7 +334,23 @@ function testimonial_rotator_rotator_columns( $columns )
 function testimonial_rotator_rotator_add_columns( $column ) 
 {
 	global $post;
-	if ( $column == 'shortcode' )  	{ echo '[testimonial_rotator id=' . $post->ID . ']'; }
+	if ( $column == 'shortcode' )  	{ 	echo '
+												<b>Base Rotator</b><br />
+												[testimonial_rotator id=' . $post->ID . '] or [testimonial_rotator id=' . $post->post_name . ']<br /><br />
+												
+												<b>List All Testimonials</b><br />
+												[testimonial_rotator id=' . $post->ID . ' format=list]<br /><br />
+												
+												<b>Limit Results to 10</b><br />
+												[testimonial_rotator id=' . $post->post_name . ' format=list limit=10]<br /><br />
+													
+												<b>Hide Titles</b><br />
+												[testimonial_rotator id=' . $post->post_name . ' hide_title=true]<br /><br />
+												
+												<b>Randomize Testimonials</b><br />
+												[testimonial_rotator id=' . $post->post_name . ' shuffle=true]<br /><br />	
+											'; }
+	if ( $column == 'slug' ) { echo $post->post_name; }
 }
 
 
@@ -353,6 +387,7 @@ function testimonial_rotator($atts)
 	$show_title 		= isset($atts['hide_title']) ? false : true;
 	$format				= isset($atts['format']) ? $atts['format'] : "rotator";
 	$post_count			= isset($atts['limit']) ? (int) $atts['limit'] : -1;
+	$shuffle			= (isset($atts['shuffle']) AND $atts['shuffle'] == 1) ? 1 : 0;
 
 	$timeout		= (int) get_post_meta( $id, '_timeout', true );
 	$timeout 		= round($timeout * 1000);
@@ -365,8 +400,10 @@ function testimonial_rotator($atts)
 		if(!$rotator) return;
 		$id = $rotator->ID;
 	}
+	
+	$order_by = ($shuffle) ? "rand" : "menu_order";
 
-	$testimonials_args = array( 'post_type' => 'testimonial', 'order' => 'ASC', 'orderby' => 'menu_order', 'meta_key' => '_rotator_id', 'meta_value' => $id, 'posts_per_page' => $post_count );
+	$testimonials_args = array( 'post_type' => 'testimonial', 'order' => 'ASC', 'orderby' => $order_by, 'meta_key' => '_rotator_id', 'meta_value' => $id, 'posts_per_page' => $post_count );
 
 	$testimonials = new WP_Query( apply_filters( 'testimonial_rotator_display_args', $testimonials_args ) );
 
@@ -427,17 +464,63 @@ class TestimonialRotatorWidget extends WP_Widget
  
 	function form($instance)
 	{
+		$rotators = get_posts( array( 'post_type' => 'testimonial_rotator', 'numberposts' => -1, 'orderby' => 'title', 'order' => 'ASC' ) );
+		
 		$instance = wp_parse_args( (array) $instance, array( 'title' => '' ) );
-		$title = $instance['title'];
+		
+		$title 			= isset($instance['title']) ? $instance['title'] : "";
+		$rotator_id 	= isset($instance['rotator_id']) ? $instance['rotator_id'] : 0;
+		$format			= isset($instance['format']) ? $instance['format'] : "rotator";
+		$shuffle		= (isset($instance['shuffle']) AND $instance['shuffle'] == 1) ? 1 : 0;
+		$limit 			= (int) isset($instance['limit']) ? $instance['limit'] : 5;
+		$show_size 		= (isset($instance['show_size']) AND $instance['show_size'] == "full") ? "full" : "excerpt";
+		
 	?>
 		<p><label for="<?php echo $this->get_field_id('title'); ?>">Title: <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($title); ?>" /></label></p>
+	
+		<p>
+		<label for="<?php echo $this->get_field_id('rotator_id'); ?>">Rotator:
+		<select name="<?php echo $this->get_field_name('rotator_id'); ?>" class="widefat" id="<?php echo $this->get_field_id('rotator_id'); ?>">
+			<option value="">All Rotators</option>
+			<?php foreach($rotators as $rotator) { ?>
+			<option value="<?php echo $rotator->ID ?>" <?php if($rotator->ID == $rotator_id) echo " SELECTED"; ?>><?php echo $rotator->post_title ?></option>
+			<?php } ?>
+		</select>
+		</label>
+		</p>
+		
+		<p><label for="<?php echo $this->get_field_id('limit'); ?>">Limit: <input class="widefat" id="<?php echo $this->get_field_id('limit'); ?>" name="<?php echo $this->get_field_name('limit'); ?>" type="text" value="<?php echo esc_attr($limit); ?>" /></label></p>
+	
+		
+		<p>
+			<label for="<?php echo $this->get_field_id('format'); ?>">Display</label>: &nbsp;
+			<input id="<?php echo $this->get_field_id('format'); ?>" name="<?php echo $this->get_field_name('format'); ?>" value="rotator" type="radio"<?php if($format != "list") echo " checked='checked'"; ?>> Rotator &nbsp;
+			<input id="<?php echo $this->get_field_id('format'); ?>" name="<?php echo $this->get_field_name('format'); ?>" value="list" type="radio"<?php if($format == "list") echo " checked='checked'"; ?>> List
+		</p>		
+		
+		<p>
+			<label for="<?php echo $this->get_field_id('show_size'); ?>">Show as</label>: &nbsp;
+			<input id="<?php echo $this->get_field_id('show_size'); ?>" name="<?php echo $this->get_field_name('show_size'); ?>" value="full" type="radio"<?php if($show_size == "full") echo " checked='checked'"; ?>> Full &nbsp;
+			<input id="<?php echo $this->get_field_id('show_size'); ?>" name="<?php echo $this->get_field_name('show_size'); ?>" value="excerpt" type="radio"<?php if($show_size == "excerpt") echo " checked='checked'"; ?>> Excerpt
+		</p>
+		
+		<p>
+			<input id="<?php echo $this->get_field_id('shuffle'); ?>" name="<?php echo $this->get_field_name('shuffle'); ?>" value="1" type="checkbox"<?php if($shuffle) echo " checked='checked'"; ?>>&nbsp;
+			<label for="<?php echo $this->get_field_id('shuffle'); ?>">Randomize Testimonials</label>
+		</p>
+		
 	<?php
 	}
  
 	function update($new_instance, $old_instance)
 	{
 		$instance = $old_instance;
-		$instance['title'] = $new_instance['title'];
+		$instance['title'] 			= $new_instance['title'];
+		$instance['rotator_id'] 	= $new_instance['rotator_id'];
+		$instance['format'] 		= $new_instance['format'];
+		$instance['shuffle'] 		= $new_instance['shuffle'] ? 1 : 0;
+		$instance['show_size'] 		= $new_instance['show_size'];
+		$instance['limit'] 			= $new_instance['limit'];
 		return $instance;
 	}
  
@@ -446,10 +529,28 @@ class TestimonialRotatorWidget extends WP_Widget
 		extract($args, EXTR_SKIP);
 		
 		echo $before_widget;
-		$title = empty($instance['title']) ? ' ' : apply_filters('widget_title', $instance['title']);
+		
+		$title 			= empty($instance['title']) ? ' ' : apply_filters('widget_title', $instance['title']);
+		$rotator_id 	= isset($instance['rotator_id']) ? $instance['rotator_id'] : false ;
+		$shuffle		= (isset($instance['shuffle']) AND $instance['shuffle'] == 1) ? 1 : 0;
+		$show_size 		= (isset($instance['show_size']) AND $instance['show_size'] == "full") ? "full" : "excerpt";
+		$limit 			= (int) isset($instance['limit']) ? $instance['limit'] : 5;
+		$format			= isset($instance['format']) ? $instance['format'] : "rotator";
+		
 		if (!empty($title)) { echo $before_title . $title . $after_title; }
 
-		$testimonials_args = array( 'post_type' => 'testimonial', 'orderby' => 'rand', 'number_of_posts' => 5 );
+		$testimonials_args = array( 'post_type' => 'testimonial', 'orderby' => 'menu_order', 'posts_per_page' => $limit );
+
+		if($rotator_id)
+		{
+			$testimonials_args['meta_key'] 		= '_rotator_id';
+			$testimonials_args['meta_value'] 	= $rotator_id;
+		}	
+		
+		if($shuffle)
+		{
+			$testimonials_args['orderby'] = 'rand';
+		}	
 		
 		$testimonials = new WP_Query( apply_filters( 'testimonial_rotator_widget_testimonial_args', $testimonials_args )  );
 		
@@ -466,8 +567,19 @@ class TestimonialRotatorWidget extends WP_Widget
 					
 				$slide = "<div class=\"slide\">\n";		
 				$slide .= "	<blockquote>\n";
-				$slide .= get_the_excerpt();
-				$slide .= "	<cite>- " . get_the_title() . "</cite>";
+				
+				if($show_size == "full")
+				{
+					$slide .= apply_filters('the_content', get_the_content());
+				}
+				else
+				{
+					$slide .= get_the_excerpt();
+				}
+				
+				$cite_title = get_the_title();
+				if($cite_title) $slide .= "	<cite>- {$cite_title}</cite>";
+				
 				$slide .= "	</blockquote>\n";
 				$slide .= "</div>\n";
 				
@@ -475,12 +587,16 @@ class TestimonialRotatorWidget extends WP_Widget
 			} 
 			
 			$rtn .= "</div>\n</div>\n\n";
-			$rtn .= "<script> 
-					jQuery(document).ready(function()
-					{
-						jQuery('#testimonial_rotator_widget_{$id}').cycle( { fit: true, fx : 'fade', timeout: " . apply_filters( 'testimonial_rotator_widget_timeout', 4000 ) . ", speed: " . apply_filters( 'testimonial_rotator_widget_speed', 750 ) . ", pause: true, before: function() { jQuery(this).parent().animate({height: jQuery(this).height() }); } } );  
-					}); 
-				</script> ";
+			
+			if($format == "rotator")
+			{
+				$rtn .= "<script> 
+						jQuery(document).ready(function()
+						{
+							jQuery('#testimonial_rotator_widget_{$id}').cycle( { fit: true, fx : 'fade', timeout: " . apply_filters( 'testimonial_rotator_widget_timeout', 4000 ) . ", speed: " . apply_filters( 'testimonial_rotator_widget_speed', 750 ) . ", pause: true, before: function() { jQuery(this).parent().animate({height: jQuery(this).height() }); } } );  
+						}); 
+					</script> ";
+			}
 			echo $rtn;
 		}
 		
