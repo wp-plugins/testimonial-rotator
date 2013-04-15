@@ -18,7 +18,19 @@ It's designed for developers and their clients by using minimal CSS and several 
 
 Example shortcode with all attributes:
 
-`[testimonial_rotator id=359 hide_title=true format=list limit=25]`
+`[testimonial_rotator id=407] or [testimonial_rotator id=rotator_slug]
+
+List All Testimonials
+[testimonial_rotator id=407 format=list]
+
+Limit Results to 10
+[testimonial_rotator id=rotator_slug format=list limit=10]
+
+Hide Titles
+[testimonial_rotator id=rotator_slug hide_title=true]
+
+Randomize Testimonials
+[testimonial_rotator id=rotator_slug shuffle=true]`
 
 == Installation ==
 
