@@ -34,7 +34,7 @@ Randomize Testimonials
 [testimonial_rotator id=rotator_slug shuffle=true]`
 
 
-Example Testimonial HTML:
+Example Shortcode HTML:
 
 `
 <div class="testimonial_rotator_wrap">
