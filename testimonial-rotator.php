@@ -7,7 +7,7 @@ Author: Hal Gatewood
 Author URI: http://www.halgatewood.com
 Text Domain: testimonial_rotator
 Domain Path: /languages
-Version: 1.3
+Version: 1.3.1
 */
 
 /*
@@ -388,10 +388,6 @@ function testimonial_rotator($atts)
 	$format				= isset($atts['format']) ? $atts['format'] : "rotator";
 	$post_count			= isset($atts['limit']) ? (int) $atts['limit'] : -1;
 	$shuffle			= (isset($atts['shuffle']) AND $atts['shuffle'] == 1) ? 1 : 0;
-
-	$timeout		= (int) get_post_meta( $id, '_timeout', true );
-	$timeout 		= round($timeout * 1000);
-	$fx				= get_post_meta( $id, '_fx', true );
 	
 	// IF ID IS NOT NUMERIC CHECK FOR SLUG
 	if(!is_numeric($id))
@@ -400,6 +396,10 @@ function testimonial_rotator($atts)
 		if(!$rotator) return;
 		$id = $rotator->ID;
 	}
+	
+	$timeout		= (int) get_post_meta( $id, '_timeout', true );
+	$timeout 		= round($timeout * 1000);
+	$fx				= get_post_meta( $id, '_fx', true );
 	
 	$order_by = ($shuffle) ? "rand" : "menu_order";
 
