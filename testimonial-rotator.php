@@ -7,7 +7,7 @@ Author: Hal Gatewood
 Author URI: http://www.halgatewood.com
 Text Domain: testimonial_rotator
 Domain Path: /languages
-Version: 1.3.1
+Version: 1.3.2
 */
 
 /*
@@ -407,9 +407,11 @@ function testimonial_rotator($atts)
 
 	$testimonials = new WP_Query( apply_filters( 'testimonial_rotator_display_args', $testimonials_args ) );
 
+	$rtn = "";
+
 	if ( $testimonials->have_posts() )
 	{
-		$rtn = "<div class=\"testimonial_rotator_wrap\">\n";
+		$rtn .= "<div class=\"testimonial_rotator_wrap\">\n";
 		$rtn .= "	<div id=\"testimonial_rotator_{$id}\" class=\"testimonial_rotator\">\n";
 		
 		do_action( 'testimonial_rotator_slides_before' );
@@ -445,11 +447,10 @@ function testimonial_rotator($atts)
 						}); 
 					</script> ";		
 		}
-		
-		return $rtn;
 	}
 	wp_reset_postdata();
 	wp_reset_query();
+	return $rtn;
 }
 
 
@@ -554,9 +555,11 @@ class TestimonialRotatorWidget extends WP_Widget
 		
 		$testimonials = new WP_Query( apply_filters( 'testimonial_rotator_widget_testimonial_args', $testimonials_args )  );
 		
+		$rtn = "";
+		
 		if ( $testimonials->have_posts() )
 		{
-			$rtn = "<div class=\"testimonial_rotator_widget_wrap\">\n";
+			$rtn .= "<div class=\"testimonial_rotator_widget_wrap\">\n";
 			$rtn .= "	<div id=\"testimonial_rotator_widget_{$id}\" class=\"testimonial_rotator_widget\">\n";
 			
 			$template = "slide-widget";
@@ -597,11 +600,13 @@ class TestimonialRotatorWidget extends WP_Widget
 						}); 
 					</script> ";
 			}
-			echo $rtn;
+			
 		}
 		
 		wp_reset_postdata();
 		wp_reset_query();
+		
+		echo $rtn;
 	
 		echo $after_widget;
 	}

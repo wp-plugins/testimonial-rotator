@@ -108,6 +108,9 @@ When you are adding or editing the rotator, you have the ability to specify how 
 
 == Changelog ==
 
+= 1.3.2 =
+reset query bug
+
 = 1.3 =
 * Randomize testimonials without code
 * Hide the title
