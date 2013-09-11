@@ -1,0 +1,16 @@
+/* MICRO CLEARFIX */
+.cf-tr:before, .cf-tr:after { content: " "; display: table; }
+.cf-tr:after { clear: both; }
+.cf-tr { *zoom: 1; }
+
+.testimonial_rotator_wrap { margin: 10px; padding: 10px; overflow: hidden; }
+.testimonial_rotator .slide { width: 100%; height: auto; }
+
+.testimonial_rotator .slide {}
+.testimonial_rotator .slide .img { width: 20%; margin-right: 5%; float: left; padding: 0; padding-top: .5em; }
+.testimonial_rotator .slide .img img { width: 100%; max-width: 150px; height: auto; }
+.testimonial_rotator .slide .text { width: 75%; float: left; padding: 0; margin: 0;}
+
+.testimonial_rotator_widget_wrap {}
+.testimonial_rotator_widget blockquote { background-image: none; height: auto; margin: 0; padding: 0.5em; font-style: italic; font-size: 1.3em; line-height: 1.1em; }
+.testimonial_rotator_widget blockquote cite { font-style: normal; display: block; text-align: right; margin-top: 0.4em; font-size: 0.6em; }
