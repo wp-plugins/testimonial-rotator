@@ -1,6 +1,6 @@
 === Plugin Name ===
 Contributors: halgatewood
-Donate link: http://halgatewood.com/testimonial-rotator/
+Donate link: http://halgatewood.com/donate/
 Tags: testimonials, sidebar, shortcode, testimonial, praise, homage, testimony, witness, appreciation, green light, rotator, rotators, for developers
 Requires at least: 3
 Tested up to: 3.6
