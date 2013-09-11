@@ -11,13 +11,13 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Easily add Testimonials to your WordPress Blog or Company Website.
 
 == Description ==
+Finally a really simple way to manage testimonials on your site. This plugin creates a testimonial and a testimonial rotator custom post type, complete with WordPress admin fields for adding testimonials and assigning them to rotators for display. It includes a Widget and Shortcode to display the testimonials.
 
-This plugin creates a testimonial and a testimonial rotator custom post type, complete with WordPress admin fields for adding testimonials and assigning them to rotators for display. It includes a Widget and Shortcode to display the testimonials.
-
-It's designed with minimal CSS so it will blend with your theme.
+It's designed with minimal CSS so it will blend with your theme and can easily be updated to match your theme by your developer.
 
 
-Shortcode examples:
+= Shortcode examples =
+Here are few ways you can include the rotator on your pages and posts.
 
 `[testimonial_rotator id=407] or [testimonial_rotator id=rotator_slug]
 
@@ -34,7 +34,10 @@ Randomize Testimonials
 [testimonial_rotator id=rotator_slug shuffle=true]`
 
 
-Example Shortcode HTML:
+= Example Shortcode HTML =
+Here was what the html looks like so you can over ride the styles. Add the .wrap to your CSS selector to override the basic plugin styles.
+
+.testimonial_rotator_wrap .testimonial_rotator { background: red; }
 
 `
 <div class="testimonial_rotator_wrap">
@@ -54,7 +57,8 @@ Example Shortcode HTML:
 `
 
 
-Example Widget HTML:
+= Example Widget HTML =
+The widget HTML is slightly different than the shortcode version. This allows you to style each one differently.
 
 `
 <h3 class="widget-title">Widget Title</h3>
@@ -107,6 +111,12 @@ When you are adding or editing the rotator, you have the ability to specify how 
 7. New Widget Options (version 1.3+)
 
 == Changelog ==
+
+= 1.3.3 =
+* Switched from jQuery Cycle1 to Cycle 2
+* Widget now uses Rotator FX and Timeout settings
+* Added .testimonial_rotator_widget_blockquote class to widget blockquote to help override some CSS problems with themes.
+
 
 = 1.3.2 =
 reset query bug

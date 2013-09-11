@@ -7,7 +7,7 @@ Author: Hal Gatewood
 Author URI: http://www.halgatewood.com
 Text Domain: testimonial_rotator
 Domain Path: /languages
-Version: 1.3.2
+Version: 1.3.3
 */
 
 /*
@@ -58,7 +58,8 @@ function testimonial_rotator_setup()
 
 function testimonial_rotator_wp_head()
 {
-	wp_enqueue_script( 'cycle', plugins_url('/jquery.cycle.all.js', __FILE__), array('jquery'));
+	wp_enqueue_script( 'cycle2', plugins_url('/js/jquery.cycle2.min.js', __FILE__), array('jquery'));
+	wp_enqueue_script( 'cycle2-addons', plugins_url('/js/jquery.cycle2.addons.js', __FILE__), array('jquery', 'cycle2'));
 	wp_enqueue_style( 'testimonial-rotator-style', plugins_url('/testimonial-rotator-style.css', __FILE__)); 
 }
 
@@ -229,7 +230,7 @@ function testimonial_rotator_metabox_effects()
 	$timeout		= (int) get_post_meta( $post->ID, '_timeout', true );
 	$fx				= get_post_meta( $post->ID, '_fx', true );
 	
-	$available_effects = array('fade', 'blindX', 'blindY', 'scrollUp', 'scrollDown', 'scrollLeft', 'scrollRight', 'uncover', 'none');
+	$available_effects = array('fade', 'scrollHorz', 'scrollVert',  'none');
 	
 	if(!$timeout) { $timeout = 5; }
 	?>
@@ -411,8 +412,18 @@ function testimonial_rotator($atts)
 
 	if ( $testimonials->have_posts() )
 	{
+		$addClass = ($format == "rotator") ? "cycle-slideshow"  : "";
+	
 		$rtn .= "<div class=\"testimonial_rotator_wrap\">\n";
-		$rtn .= "	<div id=\"testimonial_rotator_{$id}\" class=\"testimonial_rotator\">\n";
+		$rtn .= "	<div id=\"testimonial_rotator_{$id}\" class=\"testimonial_rotator $addClass\" 
+																			data-cycle-fx=\"{$fx}\" 
+																			data-cycle-auto-height=\"calc\" 
+																			data-cycle-slides=\"> div.slide\"
+																			data-cycle-timeout=\"{$timeout}\"
+																			data-cycle-speed=\"750\"
+																			data-cycle-pause-on-hover=\"#testimonial_rotator_{$id}\"
+																			>
+																			\n";
 		
 		do_action( 'testimonial_rotator_slides_before' );
 		
@@ -420,7 +431,7 @@ function testimonial_rotator($atts)
 		{
 			$testimonials->the_post();
 				
-			$slide = "<div class=\"slide\">\n";		
+			$slide = "<div class=\"slide cf-tr\">\n";
 			
 			if($show_title) $slide .= "	<h2>" . get_the_title() . "</h2>\n";
 			
@@ -437,17 +448,8 @@ function testimonial_rotator($atts)
 		do_action( 'testimonial_rotator_after' );
 		
 		$rtn .= "</div>\n</div>\n\n";
-		
-		if($format == "rotator")
-		{
-			$rtn .= "<script> 
-						jQuery(document).ready(function()
-						{
-							jQuery('#testimonial_rotator_{$id}').cycle( { fx : '{$fx}', timeout: {$timeout}, speed: 750, pause: true, before: function() { jQuery(this).parent().animate({height: jQuery(this).height() }); } } );   
-						}); 
-					</script> ";		
-		}
 	}
+	
 	wp_reset_postdata();
 	wp_reset_query();
 	return $rtn;
@@ -532,7 +534,7 @@ class TestimonialRotatorWidget extends WP_Widget
 		echo $before_widget;
 		
 		$title 			= empty($instance['title']) ? ' ' : apply_filters('widget_title', $instance['title']);
-		$rotator_id 	= isset($instance['rotator_id']) ? $instance['rotator_id'] : false ;
+		$rotator_id 	= (int) isset($instance['rotator_id']) ? $instance['rotator_id'] : false ;
 		$shuffle		= (isset($instance['shuffle']) AND $instance['shuffle'] == 1) ? 1 : 0;
 		$show_size 		= (isset($instance['show_size']) AND $instance['show_size'] == "full") ? "full" : "excerpt";
 		$limit 			= (int) isset($instance['limit']) ? $instance['limit'] : 5;
@@ -542,10 +544,19 @@ class TestimonialRotatorWidget extends WP_Widget
 
 		$testimonials_args = array( 'post_type' => 'testimonial', 'orderby' => 'menu_order', 'posts_per_page' => $limit );
 
+		$fx = 'fade';
+		$timeout = 4000;
+		
 		if($rotator_id)
 		{
 			$testimonials_args['meta_key'] 		= '_rotator_id';
 			$testimonials_args['meta_value'] 	= $rotator_id;
+			
+			$rotator = get_page_by_path( $rotator_id, null, 'testimonial_rotator' );
+			
+			$timeout		= (int) get_post_meta( $rotator_id, '_timeout', true );
+			$timeout 		= round($timeout * 1000);
+			$fx				= get_post_meta( $rotator_id, '_fx', true );
 		}	
 		
 		if($shuffle)
@@ -559,8 +570,16 @@ class TestimonialRotatorWidget extends WP_Widget
 		
 		if ( $testimonials->have_posts() )
 		{
+			$addClass = ($format == "rotator") ? "cycle-slideshow"  : "";
+		
 			$rtn .= "<div class=\"testimonial_rotator_widget_wrap\">\n";
-			$rtn .= "	<div id=\"testimonial_rotator_widget_{$id}\" class=\"testimonial_rotator_widget\">\n";
+			$rtn .= "	<div id=\"testimonial_rotator_widget_{$id}\" class=\"testimonial_rotator_widget {$addClass}\"
+																			data-cycle-fx=\"" . apply_filters( 'testimonial_rotator_widget_fx', $fx ) . "\" 
+																			data-cycle-auto-height=\"calc\" 
+																			data-cycle-slides=\"> div.slide\"
+																			data-cycle-timeout=\"" . apply_filters( 'testimonial_rotator_widget_timeout', $timeout ) . "\"
+																			data-cycle-speed=\"" . apply_filters( 'testimonial_rotator_widget_speed', 750 ) . "\"
+																			data-cycle-pause-on-hover=\"#testimonial_rotator_widget_{$id}\">\n";
 			
 			$template = "slide-widget";
 			
@@ -569,7 +588,7 @@ class TestimonialRotatorWidget extends WP_Widget
 				$testimonials->the_post();
 					
 				$slide = "<div class=\"slide\">\n";		
-				$slide .= "	<blockquote>\n";
+				$slide .= "	<blockquote class=\"testimonial_rotator_widget_blockquote\">\n";
 				
 				if($show_size == "full")
 				{
@@ -590,24 +609,12 @@ class TestimonialRotatorWidget extends WP_Widget
 			} 
 			
 			$rtn .= "</div>\n</div>\n\n";
-			
-			if($format == "rotator")
-			{
-				$rtn .= "<script> 
-						jQuery(document).ready(function()
-						{
-							jQuery('#testimonial_rotator_widget_{$id}').cycle( { fit: true, fx : 'fade', timeout: " . apply_filters( 'testimonial_rotator_widget_timeout', 4000 ) . ", speed: " . apply_filters( 'testimonial_rotator_widget_speed', 750 ) . ", pause: true, before: function() { jQuery(this).parent().animate({height: jQuery(this).height() }); } } );  
-						}); 
-					</script> ";
-			}
-			
 		}
 		
 		wp_reset_postdata();
 		wp_reset_query();
 		
 		echo $rtn;
-	
 		echo $after_widget;
 	}
 }
