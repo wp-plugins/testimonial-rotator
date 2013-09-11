@@ -116,7 +116,7 @@ When you are adding or editing the rotator, you have the ability to specify how 
 * Switched from jQuery Cycle1 to Cycle 2
 * Widget now uses Rotator FX and Timeout settings
 * Added .testimonial_rotator_widget_blockquote class to widget blockquote to help override some CSS problems with themes.
-
+* Rotator Height is now fixed at the highest testimonial instead of auto adjusting the height
 
 = 1.3.2 =
 reset query bug
