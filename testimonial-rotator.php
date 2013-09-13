@@ -7,7 +7,7 @@ Author: Hal Gatewood
 Author URI: http://www.halgatewood.com
 Text Domain: testimonial_rotator
 Domain Path: /languages
-Version: 1.3.3
+Version: 1.3.4
 */
 
 /*
@@ -415,15 +415,7 @@ function testimonial_rotator($atts)
 		$addClass = ($format == "rotator") ? "cycle-slideshow"  : "";
 	
 		$rtn .= "<div class=\"testimonial_rotator_wrap\">\n";
-		$rtn .= "	<div id=\"testimonial_rotator_{$id}\" class=\"testimonial_rotator $addClass\" 
-																			data-cycle-fx=\"{$fx}\" 
-																			data-cycle-auto-height=\"calc\" 
-																			data-cycle-slides=\"> div.slide\"
-																			data-cycle-timeout=\"{$timeout}\"
-																			data-cycle-speed=\"750\"
-																			data-cycle-pause-on-hover=\"#testimonial_rotator_{$id}\"
-																			>
-																			\n";
+		$rtn .= "	<div id=\"testimonial_rotator_{$id}\" class=\"testimonial_rotator $addClass\" data-cycle-fx=\"{$fx}\" data-cycle-auto-height=\"calc\" data-cycle-slides=\"> div.slide\" data-cycle-timeout=\"{$timeout}\" data-cycle-speed=\"750\" data-cycle-pause-on-hover=\"#testimonial_rotator_{$id}\">\n";
 		
 		do_action( 'testimonial_rotator_slides_before' );
 		
@@ -573,13 +565,7 @@ class TestimonialRotatorWidget extends WP_Widget
 			$addClass = ($format == "rotator") ? "cycle-slideshow"  : "";
 		
 			$rtn .= "<div class=\"testimonial_rotator_widget_wrap\">\n";
-			$rtn .= "	<div id=\"testimonial_rotator_widget_{$id}\" class=\"testimonial_rotator_widget {$addClass}\"
-																			data-cycle-fx=\"" . apply_filters( 'testimonial_rotator_widget_fx', $fx ) . "\" 
-																			data-cycle-auto-height=\"calc\" 
-																			data-cycle-slides=\"> div.slide\"
-																			data-cycle-timeout=\"" . apply_filters( 'testimonial_rotator_widget_timeout', $timeout ) . "\"
-																			data-cycle-speed=\"" . apply_filters( 'testimonial_rotator_widget_speed', 750 ) . "\"
-																			data-cycle-pause-on-hover=\"#testimonial_rotator_widget_{$id}\">\n";
+			$rtn .= "	<div id=\"testimonial_rotator_widget_{$id}\" class=\"testimonial_rotator_widget {$addClass}\" data-cycle-fx=\"" . apply_filters( 'testimonial_rotator_widget_fx', $fx ) . "\" data-cycle-auto-height=\"calc\" data-cycle-slides=\"> div.slide\" data-cycle-timeout=\"" . apply_filters( 'testimonial_rotator_widget_timeout', $timeout ) . "\" data-cycle-speed=\"" . apply_filters( 'testimonial_rotator_widget_speed', 750 ) . "\" data-cycle-pause-on-hover=\"#testimonial_rotator_widget_{$id}\">\n";
 			
 			$template = "slide-widget";
 			

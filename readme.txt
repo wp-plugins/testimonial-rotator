@@ -112,6 +112,9 @@ When you are adding or editing the rotator, you have the ability to specify how 
 
 == Changelog ==
 
+= 1.3.4 = 
+* Fixed small bug where some themes were adding extra spaces and breaking the rotator
+
 = 1.3.3 =
 * Switched from jQuery Cycle1 to Cycle 2
 * Widget now uses Rotator FX and Timeout settings
