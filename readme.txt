@@ -25,13 +25,13 @@ List All Testimonials
 [testimonial_rotator id=407 format=list]
 
 Limit Results to 10
-[testimonial_rotator id=rotator_slug format=list limit=10]
+[testimonial_rotator id="rotator_slug" format="list" limit=10]
 
 Hide Titles
-[testimonial_rotator id=rotator_slug hide_title=true]
+[testimonial_rotator id="rotator_slug" hide_title=1]
 
 Randomize Testimonials
-[testimonial_rotator id=rotator_slug shuffle=true]`
+[testimonial_rotator id="rotator_slug" shuffle=1]`
 
 
 = Example Shortcode HTML =
