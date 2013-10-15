@@ -2,7 +2,7 @@
 Contributors: halgatewood
 Donate link: http://halgatewood.com/donate/
 Tags: testimonials, sidebar, shortcode, testimonial, praise, homage, testimony, witness, appreciation, green light, rotator, rotators, for developers
-Requires at least: 3
+Requires at least: 3.5
 Tested up to: 3.6
 Stable tag: trunk
 License: GPLv2 or later
@@ -111,6 +111,9 @@ When you are adding or editing the rotator, you have the ability to specify how 
 7. New Widget Options (version 1.3+)
 
 == Changelog ==
+
+= 1.3.5 =
+* Changed cycle2 to cycletwo as it was conflicting with other plugins
 
 = 1.3.4 = 
 * Fixed small bug where some themes were adding extra spaces and breaking the rotator

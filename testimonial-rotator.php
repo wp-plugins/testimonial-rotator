@@ -7,7 +7,7 @@ Author: Hal Gatewood
 Author URI: http://www.halgatewood.com
 Text Domain: testimonial_rotator
 Domain Path: /languages
-Version: 1.3.4
+Version: 1.3.5
 */
 
 /*
@@ -58,8 +58,8 @@ function testimonial_rotator_setup()
 
 function testimonial_rotator_wp_head()
 {
-	wp_enqueue_script( 'cycle2', plugins_url('/js/jquery.cycle2.min.js', __FILE__), array('jquery'));
-	wp_enqueue_script( 'cycle2-addons', plugins_url('/js/jquery.cycle2.addons.js', __FILE__), array('jquery', 'cycle2'));
+	wp_enqueue_script( 'cycletwo', plugins_url('/js/jquery.cycletwo.js', __FILE__), array('jquery'));
+	wp_enqueue_script( 'cycletwo-addons', plugins_url('/js/jquery.cycletwo.addons.js', __FILE__), array('jquery', 'cycletwo'));
 	wp_enqueue_style( 'testimonial-rotator-style', plugins_url('/testimonial-rotator-style.css', __FILE__)); 
 }
 
@@ -253,13 +253,8 @@ function testimonial_rotator_metabox_effects()
 /* ROTATOR SUBMENU PAGE */
 function register_testimonial_rotator_submenu_page()
 {
-    global $submenu;
-    
-    $submenu['edit.php?post_type=testimonial'][5][0] = __('Testimonials', 'testimonial_rotator');
-    $submenu['edit.php?post_type=testimonial'][10][0] = __('Add Testimonial', 'testimonial_rotator');
-    
-    $submenu['edit.php?post_type=testimonial'][15] = array( __('Rotators', 'testimonial_rotator'), 'manage_options' , site_url() . '/wp-admin/edit.php?post_type=testimonial_rotator' ); 
-    $submenu['edit.php?post_type=testimonial'][20] = array( __('Add Rotator', 'testimonial_rotator'), 'manage_options' , site_url() . '/wp-admin/post-new.php?post_type=testimonial_rotator' ); 
+	add_submenu_page( 'edit.php?post_type=testimonial', __('Rotators', 'testimonial_rotator'), __('Rotators', 'testimonial_rotator'), 'manage_options', 'edit.php?post_type=testimonial_rotator' ); 
+	add_submenu_page( 'edit.php?post_type=testimonial', __('Add New', 'testimonial_rotator'), __('Add New', 'testimonial_rotator'), 'manage_options', 'post-new.php?post_type=testimonial_rotator' ); 
 }
 
 
@@ -412,10 +407,10 @@ function testimonial_rotator($atts)
 
 	if ( $testimonials->have_posts() )
 	{
-		$addClass = ($format == "rotator") ? "cycle-slideshow"  : "";
+		$addClass = ($format == "rotator") ? "cycletwo-slideshow"  : "";
 	
 		$rtn .= "<div class=\"testimonial_rotator_wrap\">\n";
-		$rtn .= "	<div id=\"testimonial_rotator_{$id}\" class=\"testimonial_rotator $addClass\" data-cycle-fx=\"{$fx}\" data-cycle-auto-height=\"calc\" data-cycle-slides=\"> div.slide\" data-cycle-timeout=\"{$timeout}\" data-cycle-speed=\"750\" data-cycle-pause-on-hover=\"#testimonial_rotator_{$id}\">\n";
+		$rtn .= "	<div id=\"testimonial_rotator_{$id}\" class=\"testimonial_rotator $addClass\" data-cycletwo-fx=\"{$fx}\" data-cycletwo-auto-height=\"calc\" data-cycletwo-slides=\"> div.slide\" data-cycletwo-timeout=\"{$timeout}\" data-cycletwo-speed=\"750\" data-cycletwo-pause-on-hover=\"#testimonial_rotator_{$id}\">\n";
 		
 		do_action( 'testimonial_rotator_slides_before' );
 		
@@ -565,7 +560,7 @@ class TestimonialRotatorWidget extends WP_Widget
 			$addClass = ($format == "rotator") ? "cycle-slideshow"  : "";
 		
 			$rtn .= "<div class=\"testimonial_rotator_widget_wrap\">\n";
-			$rtn .= "	<div id=\"testimonial_rotator_widget_{$id}\" class=\"testimonial_rotator_widget {$addClass}\" data-cycle-fx=\"" . apply_filters( 'testimonial_rotator_widget_fx', $fx ) . "\" data-cycle-auto-height=\"calc\" data-cycle-slides=\"> div.slide\" data-cycle-timeout=\"" . apply_filters( 'testimonial_rotator_widget_timeout', $timeout ) . "\" data-cycle-speed=\"" . apply_filters( 'testimonial_rotator_widget_speed', 750 ) . "\" data-cycle-pause-on-hover=\"#testimonial_rotator_widget_{$id}\">\n";
+			$rtn .= "	<div id=\"testimonial_rotator_widget_{$id}\" class=\"testimonial_rotator_widget {$addClass}\" data-cycletwo-fx=\"" . apply_filters( 'testimonial_rotator_widget_fx', $fx ) . "\" data-cycletwo-auto-height=\"calc\" data-cycletwo-slides=\"> div.slide\" data-cycletwo-timeout=\"" . apply_filters( 'testimonial_rotator_widget_timeout', $timeout ) . "\" data-cycletwo-speed=\"" . apply_filters( 'testimonial_rotator_widget_speed', 750 ) . "\" data-cycletwo-pause-on-hover=\"#testimonial_rotator_widget_{$id}\">\n";
 			
 			$template = "slide-widget";
 			
