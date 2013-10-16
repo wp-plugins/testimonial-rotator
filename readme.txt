@@ -112,6 +112,10 @@ When you are adding or editing the rotator, you have the ability to specify how 
 
 == Changelog ==
 
+= 1.3.6 =
+* Fix bug not rotating widget
+
+
 = 1.3.5 =
 * Changed cycle2 to cycletwo as it was conflicting with other plugins
 
