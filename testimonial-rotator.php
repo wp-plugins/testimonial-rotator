@@ -7,7 +7,7 @@ Author: Hal Gatewood
 Author URI: http://www.halgatewood.com
 Text Domain: testimonial_rotator
 Domain Path: /languages
-Version: 1.3.6
+Version: 1.3.7
 */
 
 /*
@@ -41,7 +41,7 @@ function testimonial_rotator_setup()
 	
 	add_filter( 'manage_edit-testimonial_columns', 'testimonial_rotator_columns' );
 	add_action( 'manage_testimonial_posts_custom_column', 'testimonial_rotator_add_columns' );
-	add_filter( 'manage_edit-testimonial_sortable_columns', 'testimonial_rotator_column_sort');
+	add_filter( 'manage_edit-testimonial_sortable_columns', 'testimonial_rotator_column_sort' );
 	
 	add_filter( 'manage_edit-testimonial_rotator_columns', 'testimonial_rotator_rotator_columns' );
 	add_action( 'manage_testimonial_rotator_posts_custom_column', 'testimonial_rotator_rotator_add_columns' );
@@ -49,18 +49,18 @@ function testimonial_rotator_setup()
 	add_action( 'admin_head', 'testimonial_rotator_cpt_icon' );
 	add_action( 'admin_head', 'testimonial_rotator_admin_menu_highlight' );
 	
-	add_action( 'admin_menu', 'register_testimonial_rotator_submenu_page');
+	add_action( 'admin_menu', 'register_testimonial_rotator_submenu_page' );
 
 	add_action( 'widgets_init', create_function('', 'return register_widget("TestimonialRotatorWidget");') );
 	
-	add_action('wp_head', 'testimonial_rotator_wp_head', 1);
+	add_action( 'wp_enqueue_scripts', 'testimonial_rotator_enqueue_scripts' );
 }
 
-function testimonial_rotator_wp_head()
+function testimonial_rotator_enqueue_scripts()
 {
-	wp_enqueue_script( 'cycletwo', plugins_url('/js/jquery.cycletwo.js', __FILE__), array('jquery'));
-	wp_enqueue_script( 'cycletwo-addons', plugins_url('/js/jquery.cycletwo.addons.js', __FILE__), array('jquery', 'cycletwo'));
-	wp_enqueue_style( 'testimonial-rotator-style', plugins_url('/testimonial-rotator-style.css', __FILE__)); 
+	wp_enqueue_script( 'cycletwo', plugins_url('/js/jquery.cycletwo.js', __FILE__), array('jquery') );
+	wp_enqueue_script( 'cycletwo-addons', plugins_url('/js/jquery.cycletwo.addons.js', __FILE__), array('jquery', 'cycletwo') );
+	wp_enqueue_style( 'testimonial-rotator-style', plugins_url('/testimonial-rotator-style.css', __FILE__) ); 
 }
 
 
@@ -68,7 +68,7 @@ function testimonial_rotator_wp_head()
 function testimonial_rotator_init() 
 {
 	// LOAD TEXT DOMAIN
-	load_plugin_textdomain( 'testimonial_rotator', false, dirname( plugin_basename( __FILE__ ) ) . '/' );
+	load_plugin_textdomain( 'testimonial_rotator', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 
 	// REGISTER SHORTCODE
 	add_shortcode( 'testimonial_rotator', 'testimonial_rotator_shortcode' );
@@ -204,19 +204,19 @@ function testimonial_rotator_shortcode_metabox()
 	
 	echo '
 		<b>Base Rotator</b><br />
-		[testimonial_rotator id=' . $post->ID . '] or [testimonial_rotator id=' . $post->post_name . ']<br /><br />
+		[testimonial_rotator id="' . $post->ID . '"] or [testimonial_rotator id="' . $post->post_name . '"]<br /><br />
 		
 		<b>List All Testimonials</b><br />
-		[testimonial_rotator id=' . $post->ID . ' format=list]<br /><br />
+		[testimonial_rotator id="' . $post->ID . '" format="list"]<br /><br />
 		
 		<b>Limit Results to 10</b><br />
-		[testimonial_rotator id=' . $post->post_name . ' format=list limit=10]<br /><br />
+		[testimonial_rotator id="' . $post->post_name . '" format="list" limit="10"]<br /><br />
 			
 		<b>Hide Titles</b><br />
-		[testimonial_rotator id=' . $post->post_name . ' hide_title=true]<br /><br />
+		[testimonial_rotator id="' . $post->post_name . '" hide_title="1"]<br /><br />
 		
 		<b>Randomize Testimonials</b><br />
-		[testimonial_rotator id=' . $post->post_name . ' shuffle=true]<br /><br />	
+		[testimonial_rotator id="' . $post->post_name . '" shuffle="1"]<br /><br />	
 	';
 	
 	echo '<span class="description">' . __('Put one of the above codes wherever you want the testimonials to appear', 'testimonial_rotator') . '</span>';	
@@ -313,6 +313,8 @@ function testimonial_rotator_add_columns( $column )
 	$edit_link = get_edit_post_link( $post->ID );
 
 	if ( $column == 'ID' ) 		{ echo get_the_title( get_post_meta( $post->ID, "_rotator_id", true ) ); }
+	if ( $column == 'image' ) 	echo '<a href="' . $edit_link . '" title="' . $post->post_title . '">' . get_the_post_thumbnail( $post->ID, array( 50, 50 ), array( 'title' => trim( strip_tags(  $post->post_title ) ) ) ) . '</a>';
+	if ( $column == 'order' ) 	echo '<a href="' . $edit_link . '">' . $post->menu_order . '</a>';
 }
 
 function testimonial_rotator_rotator_columns( $columns ) 
@@ -332,19 +334,19 @@ function testimonial_rotator_rotator_add_columns( $column )
 	global $post;
 	if ( $column == 'shortcode' )  	{ 	echo '
 												<b>Base Rotator</b><br />
-												[testimonial_rotator id=' . $post->ID . '] or [testimonial_rotator id=' . $post->post_name . ']<br /><br />
+												[testimonial_rotator id="' . $post->ID . '"] or [testimonial_rotator id="' . $post->post_name . '"]<br /><br />
 												
 												<b>List All Testimonials</b><br />
-												[testimonial_rotator id=' . $post->ID . ' format=list]<br /><br />
+												[testimonial_rotator id="' . $post->ID . '" format="list"]<br /><br />
 												
 												<b>Limit Results to 10</b><br />
-												[testimonial_rotator id=' . $post->post_name . ' format=list limit=10]<br /><br />
+												[testimonial_rotator id="' . $post->post_name . '" format="list" limit="10"]<br /><br />
 													
 												<b>Hide Titles</b><br />
-												[testimonial_rotator id=' . $post->post_name . ' hide_title=true]<br /><br />
+												[testimonial_rotator id="' . $post->post_name . '" hide_title="1"]<br /><br />
 												
 												<b>Randomize Testimonials</b><br />
-												[testimonial_rotator id=' . $post->post_name . ' shuffle=true]<br /><br />	
+												[testimonial_rotator id="' . $post->post_name . '" shuffle="1"]<br /><br />	
 											'; }
 	if ( $column == 'slug' ) { echo $post->post_name; }
 }
@@ -605,11 +607,25 @@ class TestimonialRotatorWidget extends WP_Widget
 /* ADMIN ICON */
 function testimonial_rotator_cpt_icon() 
 {
-	?>
+	global $wp_version;
+	
+	if($wp_version >= 3.8)
+	{
+		echo '
+			<style> 
+				#adminmenu #menu-posts-testimonial div.wp-menu-image:before { content: "\f205"; }
+			</style>
+		';	
+	}
+	else
+	{
+?>
 	<style type="text/css" media="screen">
 		#menu-posts-testimonial .wp-menu-image { background: url(<?php echo TESTIMONIAL_ROTATOR_URI . '/thumb-up.png'; ?>) no-repeat 6px -17px !important; }
 		#menu-posts-testimonial:hover .wp-menu-image, #menu-posts-testimonial.wp-has-current-submenu .wp-menu-image { background-position: 6px 7px!important; }	
 	</style>
 <?php 
+	}
+		
 }
 ?>

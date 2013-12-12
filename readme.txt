@@ -3,7 +3,7 @@ Contributors: halgatewood
 Donate link: http://halgatewood.com/donate/
 Tags: testimonials, sidebar, shortcode, testimonial, praise, homage, testimony, witness, appreciation, green light, rotator, rotators, for developers
 Requires at least: 3.5
-Tested up to: 3.6
+Tested up to: 3.8
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -19,10 +19,10 @@ It's designed with minimal CSS so it will blend with your theme and can easily b
 = Shortcode examples =
 Here are few ways you can include the rotator on your pages and posts.
 
-`[testimonial_rotator id=407] or [testimonial_rotator id=rotator_slug]
+`[testimonial_rotator id="407"] or [testimonial_rotator id="rotator_slug"]
 
 List All Testimonials
-[testimonial_rotator id=407 format=list]
+[testimonial_rotator id="407" format="list"]
 
 Limit Results to 10
 [testimonial_rotator id="rotator_slug" format="list" limit=10]
@@ -106,15 +106,21 @@ When you are adding or editing the rotator, you have the ability to specify how 
 2. Adding a Testimonial Rotator
 3. Add a new Testimonial. Uses built-in WordPress functionality like excerpt, featured images and menu order
 4. A Testimonial Rotator inserted into a block of text with a shortcode
-5. Testimonials have their own page and use the single template.
-6. Testimonial widget also included and uses just the excerpt to display the best part of the testimonial
+5. Testimonials have their own page and use the single template they can be customized by making a single-testimonial.php file in your theme.
+6. Testimonial widget on the new TwentyFourteen theme
 7. New Widget Options (version 1.3+)
 
 == Changelog ==
 
+= 1.3.7 =
+* Updated icon for WordPress 3.8
+* Fixed translation and added languages folder, moved .pot to this folder
+* Moved styles and scripts from action wp_head to wp_enqueue_scripts
+* Fixed images and order not showing in admin list view
+* Prepped for an upcoming PRO version!
+
 = 1.3.6 =
 * Fix bug not rotating widget
-
 
 = 1.3.5 =
 * Changed cycle2 to cycletwo as it was conflicting with other plugins
