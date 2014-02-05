@@ -7,7 +7,7 @@ Author: Hal Gatewood
 Author URI: http://www.halgatewood.com
 Text Domain: testimonial_rotator
 Domain Path: /languages
-Version: 1.3.7
+Version: 1.4
 */
 
 /*
@@ -105,7 +105,7 @@ function testimonial_rotator_init()
 					'hierarchical' 			=> false,
 					'menu_position' 		=> 26.6,
 					'exclude_from_search' 	=> true,
-					'supports' 				=> array( 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes' )
+					'supports' 				=> apply_filters( "testimonial_rotator_testimonial_supports", array( 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes' ) )
 					);
 					
 	register_post_type( 'testimonial', $args );
@@ -140,7 +140,7 @@ function testimonial_rotator_init()
 					'hierarchical' 			=> false,
 					'menu_position' 		=> 26.7,
 					'exclude_from_search' 	=> true,
-					'supports' 				=> array( 'title' )
+					'supports' 				=> apply_filters( "testimonial_rotator_supports", array( 'title' ) )
 					);
 					
 	register_post_type( 'testimonial_rotator', $args );
@@ -203,20 +203,20 @@ function testimonial_rotator_shortcode_metabox()
 	global $post;
 	
 	echo '
-		<b>Base Rotator</b><br />
-		[testimonial_rotator id="' . $post->ID . '"] or [testimonial_rotator id="' . $post->post_name . '"]<br /><br />
+		<b>' . __('Base Rotator', 'testimonial_rotator') . '</b><br />
+		[testimonial_rotator id="' . $post->ID . '"]<br /><br />
 		
-		<b>List All Testimonials</b><br />
+		<b>' . __('List All Testimonials', 'testimonial_rotator') . '</b><br />
 		[testimonial_rotator id="' . $post->ID . '" format="list"]<br /><br />
 		
-		<b>Limit Results to 10</b><br />
-		[testimonial_rotator id="' . $post->post_name . '" format="list" limit="10"]<br /><br />
+		<b>' . __('Limit Results to 10', 'testimonial_rotator') . '</b><br />
+		[testimonial_rotator id="' . $post->ID . '" format="list" limit="10"]<br /><br />
 			
-		<b>Hide Titles</b><br />
-		[testimonial_rotator id="' . $post->post_name . '" hide_title="1"]<br /><br />
+		<b>' . __('Hide Titles', 'testimonial_rotator') . '</b><br />
+		[testimonial_rotator id="' . $post->ID . '" hide_title="1"]<br /><br />
 		
-		<b>Randomize Testimonials</b><br />
-		[testimonial_rotator id="' . $post->post_name . '" shuffle="1"]<br /><br />	
+		<b>' . __('Randomize Testimonials', 'testimonial_rotator') . '</b><br />
+		[testimonial_rotator id="' . $post->ID . '" shuffle="1"]<br /><br />	
 	';
 	
 	echo '<span class="description">' . __('Put one of the above codes wherever you want the testimonials to appear', 'testimonial_rotator') . '</span>';	
@@ -332,22 +332,24 @@ function testimonial_rotator_rotator_columns( $columns )
 function testimonial_rotator_rotator_add_columns( $column ) 
 {
 	global $post;
-	if ( $column == 'shortcode' )  	{ 	echo '
-												<b>Base Rotator</b><br />
-												[testimonial_rotator id="' . $post->ID . '"] or [testimonial_rotator id="' . $post->post_name . '"]<br /><br />
-												
-												<b>List All Testimonials</b><br />
-												[testimonial_rotator id="' . $post->ID . '" format="list"]<br /><br />
-												
-												<b>Limit Results to 10</b><br />
-												[testimonial_rotator id="' . $post->post_name . '" format="list" limit="10"]<br /><br />
-													
-												<b>Hide Titles</b><br />
-												[testimonial_rotator id="' . $post->post_name . '" hide_title="1"]<br /><br />
-												
-												<b>Randomize Testimonials</b><br />
-												[testimonial_rotator id="' . $post->post_name . '" shuffle="1"]<br /><br />	
-											'; }
+	if ( $column == 'shortcode' )  	
+	{ 	
+		echo '
+			<b>' . __('Base Rotator') . '</b><br />
+			[testimonial_rotator id="' . $post->ID . '"]<br /><br />
+			
+			<b>' . __('List All Testimonials') . '</b><br />
+			[testimonial_rotator id="' . $post->ID . '" format="list"]<br /><br />
+			
+			<b>' . __('Limit Results to 10') . '</b><br />
+			[testimonial_rotator id="' . $post->ID . '" format="list" limit="10"]<br /><br />
+				
+			<b>' . __('Hide Titles') . '</b><br />
+			[testimonial_rotator id="' . $post->ID . '" hide_title="1"]<br /><br />
+			
+			<b>' . __('Randomize Testimonials') . '</b><br />
+			[testimonial_rotator id="' . $post->ID . '" shuffle="1"]<br /><br />	
+		'; }
 	if ( $column == 'slug' ) { echo $post->post_name; }
 }
 
@@ -381,27 +383,47 @@ function testimonial_rotator_shortcode($atts)
 /* MEAT & POTATOES OF THE ROTATOR */
 function testimonial_rotator($atts)
 {
-	$id 				= isset($atts['id']) ? $atts['id'] : "";
+	$id 				= isset($atts['id']) ? $atts['id'] : false;
 	$show_title 		= isset($atts['hide_title']) ? false : true;
 	$format				= isset($atts['format']) ? $atts['format'] : "rotator";
 	$post_count			= isset($atts['limit']) ? (int) $atts['limit'] : -1;
 	$shuffle			= (isset($atts['shuffle']) AND $atts['shuffle'] == 1) ? 1 : 0;
 	
-	// IF ID IS NOT NUMERIC CHECK FOR SLUG
-	if(!is_numeric($id))
+
+	
+	// SETUP TESTIMONIAL ARGS
+	$testimonials_args = array();
+	$testimonials_args['post_type'] 			= "testimonial";
+	$testimonials_args['order'] 				= "ASC";
+	$testimonials_args['orderby'] 				= ($shuffle) ? "rand" : "menu_order";
+	$testimonials_args['posts_per_page'] 		= $post_count;
+
+	
+	// SHOW ALL TESTIMONIALS
+	if($id)
 	{
-		$rotator = get_page_by_path( $id, null, 'testimonial_rotator' );
-		if(!$rotator) return;
-		$id = $rotator->ID;
+		if(!is_numeric($id))
+		{
+			$rotator = get_page_by_path( $id, null, 'testimonial_rotator' );
+			if($rotator)
+			{
+				$id = $rotator->ID;
+				$testimonials_args['meta_key'] 			= '_rotator_id';
+				$testimonials_args['meta_value'] 		= $id;
+			}
+		}
+		else
+		{
+			$testimonials_args['meta_key'] 				= '_rotator_id';
+			$testimonials_args['meta_value'] 			= $id;
+		}
 	}
+
 	
 	$timeout		= (int) get_post_meta( $id, '_timeout', true );
 	$timeout 		= round($timeout * 1000);
 	$fx				= get_post_meta( $id, '_fx', true );
 	
-	$order_by = ($shuffle) ? "rand" : "menu_order";
-
-	$testimonials_args = array( 'post_type' => 'testimonial', 'order' => 'ASC', 'orderby' => $order_by, 'meta_key' => '_rotator_id', 'meta_value' => $id, 'posts_per_page' => $post_count );
 
 	$testimonials = new WP_Query( apply_filters( 'testimonial_rotator_display_args', $testimonials_args ) );
 
@@ -412,7 +434,7 @@ function testimonial_rotator($atts)
 		$addClass = ($format == "rotator") ? "cycletwo-slideshow"  : "";
 	
 		$rtn .= "<div class=\"testimonial_rotator_wrap\">\n";
-		$rtn .= "	<div id=\"testimonial_rotator_{$id}\" class=\"testimonial_rotator $addClass\" data-cycletwo-fx=\"{$fx}\" data-cycletwo-auto-height=\"calc\" data-cycletwo-slides=\"> div.slide\" data-cycletwo-timeout=\"{$timeout}\" data-cycletwo-speed=\"750\" data-cycletwo-pause-on-hover=\"#testimonial_rotator_{$id}\">\n";
+		$rtn .= "	<div id=\"testimonial_rotator_{$id}\" class=\"testimonial_rotator $addClass\" data-cycletwo-fx=\"{$fx}\" data-cycletwo-auto-height=\"" . apply_filters( 'testimonial_rotator_calc', 'calc' ) . "\" data-cycletwo-slides=\"> div.slide\" data-cycletwo-timeout=\"{$timeout}\" data-cycletwo-speed=\"" . apply_filters( 'testimonial_rotator_speed', 750 ) . "\" data-cycletwo-pause-on-hover=\"#testimonial_rotator_{$id}\">\n";
 		
 		do_action( 'testimonial_rotator_slides_before' );
 		
@@ -428,7 +450,7 @@ function testimonial_rotator($atts)
 			{ 
 				$slide .= "	<div class=\"img\">" . get_the_post_thumbnail( get_the_ID(), 'thumbnail') . "</div>\n"; 
 			}
-			$slide .= "	<div class=\"text\">" . apply_filters( 'the_content', get_the_content() ) . "</div>\n";
+			$slide .= "	<div class=\"text\">" . do_shortcode(nl2br(get_the_content(' '))) . "</div>\n";
 			$slide .= "</div>\n";
 
 			$rtn .= apply_filters( 'testimonial_rotator_slide', $slide );
@@ -468,12 +490,12 @@ class TestimonialRotatorWidget extends WP_Widget
 		$show_size 		= (isset($instance['show_size']) AND $instance['show_size'] == "full") ? "full" : "excerpt";
 		
 	?>
-		<p><label for="<?php echo $this->get_field_id('title'); ?>">Title: <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($title); ?>" /></label></p>
+		<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:', 'testimonial_rotator'); ?> <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($title); ?>" /></label></p>
 	
 		<p>
-		<label for="<?php echo $this->get_field_id('rotator_id'); ?>">Rotator:
+		<label for="<?php echo $this->get_field_id('rotator_id'); ?>"><?php _e('Rotator', 'testimonial_rotator'); ?>:
 		<select name="<?php echo $this->get_field_name('rotator_id'); ?>" class="widefat" id="<?php echo $this->get_field_id('rotator_id'); ?>">
-			<option value="">All Rotators</option>
+			<option value=""><?php _e('All Rotators', 'testimonial_rotator'); ?></option>
 			<?php foreach($rotators as $rotator) { ?>
 			<option value="<?php echo $rotator->ID ?>" <?php if($rotator->ID == $rotator_id) echo " SELECTED"; ?>><?php echo $rotator->post_title ?></option>
 			<?php } ?>
@@ -481,24 +503,24 @@ class TestimonialRotatorWidget extends WP_Widget
 		</label>
 		</p>
 		
-		<p><label for="<?php echo $this->get_field_id('limit'); ?>">Limit: <input class="widefat" id="<?php echo $this->get_field_id('limit'); ?>" name="<?php echo $this->get_field_name('limit'); ?>" type="text" value="<?php echo esc_attr($limit); ?>" /></label></p>
+		<p><label for="<?php echo $this->get_field_id('limit'); ?>"><?php _e('Limit:', 'testimonial_rotator'); ?> <input class="widefat" id="<?php echo $this->get_field_id('limit'); ?>" name="<?php echo $this->get_field_name('limit'); ?>" type="text" value="<?php echo esc_attr($limit); ?>" /></label></p>
 	
 		
 		<p>
-			<label for="<?php echo $this->get_field_id('format'); ?>">Display</label>: &nbsp;
-			<input id="<?php echo $this->get_field_id('format'); ?>" name="<?php echo $this->get_field_name('format'); ?>" value="rotator" type="radio"<?php if($format != "list") echo " checked='checked'"; ?>> Rotator &nbsp;
-			<input id="<?php echo $this->get_field_id('format'); ?>" name="<?php echo $this->get_field_name('format'); ?>" value="list" type="radio"<?php if($format == "list") echo " checked='checked'"; ?>> List
+			<label for="<?php echo $this->get_field_id('format'); ?>"><?php _e('Display:', 'testimonial_rotator'); ?></label> &nbsp;
+			<input id="<?php echo $this->get_field_id('format'); ?>" name="<?php echo $this->get_field_name('format'); ?>" value="rotator" type="radio"<?php if($format != "list") echo " checked='checked'"; ?>> <?php _e('Rotator', 'testimonial_rotator'); ?> &nbsp;
+			<input id="<?php echo $this->get_field_id('format'); ?>" name="<?php echo $this->get_field_name('format'); ?>" value="list" type="radio"<?php if($format == "list") echo " checked='checked'"; ?>> <?php _e('List', 'testimonial_rotator'); ?>
 		</p>		
 		
 		<p>
-			<label for="<?php echo $this->get_field_id('show_size'); ?>">Show as</label>: &nbsp;
-			<input id="<?php echo $this->get_field_id('show_size'); ?>" name="<?php echo $this->get_field_name('show_size'); ?>" value="full" type="radio"<?php if($show_size == "full") echo " checked='checked'"; ?>> Full &nbsp;
-			<input id="<?php echo $this->get_field_id('show_size'); ?>" name="<?php echo $this->get_field_name('show_size'); ?>" value="excerpt" type="radio"<?php if($show_size == "excerpt") echo " checked='checked'"; ?>> Excerpt
+			<label for="<?php echo $this->get_field_id('show_size'); ?>"><?php _e('Show as:', 'testimonial_rotator'); ?></label> &nbsp;
+			<input id="<?php echo $this->get_field_id('show_size'); ?>" name="<?php echo $this->get_field_name('show_size'); ?>" value="full" type="radio"<?php if($show_size == "full") echo " checked='checked'"; ?>> <?php _e('Full', 'testimonial_rotator'); ?>&nbsp;
+			<input id="<?php echo $this->get_field_id('show_size'); ?>" name="<?php echo $this->get_field_name('show_size'); ?>" value="excerpt" type="radio"<?php if($show_size == "excerpt") echo " checked='checked'"; ?>> <?php _e('Excerpt', 'testimonial_rotator'); ?>
 		</p>
 		
 		<p>
 			<input id="<?php echo $this->get_field_id('shuffle'); ?>" name="<?php echo $this->get_field_name('shuffle'); ?>" value="1" type="checkbox"<?php if($shuffle) echo " checked='checked'"; ?>>&nbsp;
-			<label for="<?php echo $this->get_field_id('shuffle'); ?>">Randomize Testimonials</label>
+			<label for="<?php echo $this->get_field_id('shuffle'); ?>"><?php _e('Randomize Testimonials', 'testimonial_rotator'); ?></label>
 		</p>
 		
 	<?php
@@ -510,7 +532,7 @@ class TestimonialRotatorWidget extends WP_Widget
 		$instance['title'] 			= $new_instance['title'];
 		$instance['rotator_id'] 	= $new_instance['rotator_id'];
 		$instance['format'] 		= $new_instance['format'];
-		$instance['shuffle'] 		= $new_instance['shuffle'] ? 1 : 0;
+		$instance['shuffle'] 		= isset($new_instance['shuffle']) ? 1 : 0;
 		$instance['show_size'] 		= $new_instance['show_size'];
 		$instance['limit'] 			= $new_instance['limit'];
 		return $instance;
@@ -562,7 +584,7 @@ class TestimonialRotatorWidget extends WP_Widget
 			$addClass = ($format == "rotator") ? "cycletwo-slideshow"  : "";
 		
 			$rtn .= "<div class=\"testimonial_rotator_widget_wrap\">\n";
-			$rtn .= "	<div id=\"testimonial_rotator_widget_{$id}\" class=\"testimonial_rotator_widget {$addClass}\" data-cycletwo-fx=\"" . apply_filters( 'testimonial_rotator_widget_fx', $fx ) . "\" data-cycletwo-auto-height=\"calc\" data-cycletwo-slides=\"> div.slide\" data-cycletwo-timeout=\"" . apply_filters( 'testimonial_rotator_widget_timeout', $timeout ) . "\" data-cycletwo-speed=\"" . apply_filters( 'testimonial_rotator_widget_speed', 750 ) . "\" data-cycletwo-pause-on-hover=\"#testimonial_rotator_widget_{$id}\">\n";
+			$rtn .= "	<div id=\"testimonial_rotator_widget_{$id}\" class=\"testimonial_rotator_widget {$addClass}\" data-cycletwo-fx=\"" . apply_filters( 'testimonial_rotator_widget_fx', $fx ) . "\" data-cycletwo-auto-height=\"" . apply_filters( 'testimonial_rotator_widget_calc', 'calc' ) . "\" data-cycletwo-slides=\"> div.slide\" data-cycletwo-timeout=\"" . apply_filters( 'testimonial_rotator_widget_timeout', $timeout ) . "\" data-cycletwo-speed=\"" . apply_filters( 'testimonial_rotator_widget_speed', 750 ) . "\" data-cycletwo-pause-on-hover=\"#testimonial_rotator_widget_{$id}\">\n";
 			
 			$template = "slide-widget";
 			
@@ -575,7 +597,7 @@ class TestimonialRotatorWidget extends WP_Widget
 				
 				if($show_size == "full")
 				{
-					$slide .= apply_filters('the_content', get_the_content());
+					$slide .= do_shortcode(nl2br(get_the_content(' ')));
 				}
 				else
 				{
