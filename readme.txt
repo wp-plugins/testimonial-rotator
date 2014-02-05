@@ -19,19 +19,23 @@ It's designed with minimal CSS so it will blend with your theme and can easily b
 = Shortcode examples =
 Here are few ways you can include the rotator on your pages and posts.
 
-`[testimonial_rotator id="407"] or [testimonial_rotator id="rotator_slug"]
+`Display Testimonials from All Rotators
+[testimonial_rotator]
 
-List All Testimonials
+Display Testimonials in Rotator #407
+[testimonial_rotator id="407"]
+
+List All Testimonials in Rotator #407
 [testimonial_rotator id="407" format="list"]
 
 Limit Results to 10
-[testimonial_rotator id="rotator_slug" format="list" limit=10]
+[testimonial_rotator id="407" format="list" limit=10]
 
 Hide Titles
-[testimonial_rotator id="rotator_slug" hide_title=1]
+[testimonial_rotator id="407" hide_title=1]
 
 Randomize Testimonials
-[testimonial_rotator id="rotator_slug" shuffle=1]`
+[testimonial_rotator id="407" shuffle=1]`
 
 
 = Example Shortcode HTML =
@@ -110,7 +114,15 @@ When you are adding or editing the rotator, you have the ability to specify how 
 6. Testimonial widget on the new TwentyFourteen theme
 7. New Widget Options (version 1.3+)
 
+
+
 == Changelog ==
+
+= 1.4 =
+* Use shortcode to display testimonials from all rotators by not passing in an 'id' attribute
+* Completed preparation for translation, wrapped all text in __()
+* Two new filters for the 'supports' section of the register_post_type: testimonial_rotator_supports and testimonial_rotator_testimonial_supports
+* Two new filters for auto-height 'calc': testimonial_rotator_calc and testimonial_rotator_widget_fx
 
 = 1.3.7 =
 * Updated icon for WordPress 3.8
