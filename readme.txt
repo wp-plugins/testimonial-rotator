@@ -101,9 +101,6 @@ The widget HTML is slightly different than the shortcode version. This allows yo
 
 == Frequently Asked Questions ==
 
-= How do I change the speed and transition of the rotator? =
-
-When you are adding or editing the rotator, you have the ability to specify how many seconds each testimonial should appear for. You can also choose from a handful of transitions there (like fades and wipes).
 
 = I need more help, where do I go? =
 As stated before this plugin has minimal CSS and styling baked in. This allows you to adapt if for your site and theme. If you need some code snippets to enrich your functionality please visit: http://halgatewood.com/docs/plugins/testimonial-rotator/
