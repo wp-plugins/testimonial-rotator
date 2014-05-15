@@ -73,7 +73,7 @@
 
 
 /* WIDGET */
-.testimonial_rotator_widget_wrap {}
+.testimonial_rotator_widget_wrap { position: relative; }
 
 /* ERROR */
 div.testimonial-rotator-error { color: #aa3429; font-weight: bold; display: block; padding: 10px; font-size: 11px; border-radius: 3px; text-align: center; border: solid 1px #aa3429; text-transform: uppercase; }
