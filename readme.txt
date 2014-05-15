@@ -66,6 +66,10 @@ When you are adding or editing the rotator, you have the ability to specify how 
 
 == Changelog ==
 
+= 2.0.1 =
+Updated May 15, 2014
+* Added wrapper div around quote part of testimonial
+
 = 2.0 =
 Updated May 15, 2014
 * Change all rotator settings in the admin

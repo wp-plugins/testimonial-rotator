@@ -32,7 +32,9 @@ if($rating)
 }
 
 // CONTENT
+echo "<div class=\"testimonial_rotator_quote\">\n";
 echo get_the_content();
+echo "</div>\n";
 
 // AUTHOR INFO
 if( $cite )

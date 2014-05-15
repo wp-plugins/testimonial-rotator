@@ -27,7 +27,9 @@ if($rating)
 }
 
 // CONTENT
+echo "<div class=\"testimonial_rotator_quote\">\n";
 echo ($show_size == "full") ? do_shortcode(nl2br(get_the_content(' '))) : get_the_excerpt();
+echo "</div>\n";
 
 // AUTHOR INFO
 if( $cite )
