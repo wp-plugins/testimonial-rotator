@@ -7,29 +7,23 @@ Author: Hal Gatewood
 Author URI: http://www.halgatewood.com
 Text Domain: testimonial_rotator
 Domain Path: /languages
-Version: 1.3.7
-*/
-
-/*
-This program is free software; you can redistribute it and/or modify 
-it under the terms of the GNU General Public License as published by 
-the Free Software Foundation; version 2 of the License.
-
-This program is distributed in the hope that it will be useful, 
-but WITHOUT ANY WARRANTY; without even the implied warranty of 
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-GNU General Public License for more details. 
-
-You should have received a copy of the GNU General Public License 
-along with this program; if not, write to the Free Software 
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
+Version: 2.0.1
 */
 
 
-define( 'TESTIMONIAL_ROTATOR_URI', trailingslashit( plugin_dir_url( __FILE__ ) ) );
+// CONSTANTS
+if ( ! defined( 'TESTIMONIAL_ROTATOR_URI' ) ) 
+{
+	define( 'TESTIMONIAL_ROTATOR_URI', trailingslashit( plugin_dir_url( __FILE__ ) ) );
+}
+
+if ( ! defined( 'TESTIMONIAL_ROTATOR_DIR' ) ) 
+{
+	define( 'TESTIMONIAL_ROTATOR_DIR', plugin_dir_path( __FILE__ )  );
+}
 
 
-/* SETUP */
+// SETUP
 add_action( 'plugins_loaded', 'testimonial_rotator_setup' );
 function testimonial_rotator_setup() 
 {
@@ -47,24 +41,51 @@ function testimonial_rotator_setup()
 	add_action( 'manage_testimonial_rotator_posts_custom_column', 'testimonial_rotator_rotator_add_columns' );
 	
 	add_action( 'admin_head', 'testimonial_rotator_cpt_icon' );
-	add_action( 'admin_head', 'testimonial_rotator_admin_menu_highlight' );
-	
 	add_action( 'admin_menu', 'register_testimonial_rotator_submenu_page' );
-
 	add_action( 'widgets_init', create_function('', 'return register_widget("TestimonialRotatorWidget");') );
-	
 	add_action( 'wp_enqueue_scripts', 'testimonial_rotator_enqueue_scripts' );
+	
+	// ADDED 2.0
+	add_filter( 'enter_title_here', 'register_testimonial_form_title' );
+	add_filter( 'the_content', 'testimonial_rotator_single' );
+	add_action( 'admin_init', 'testimonial_rotator_settings_init' );
 }
 
+
+// DO THE CSS AND JS
 function testimonial_rotator_enqueue_scripts()
 {
 	wp_enqueue_script( 'cycletwo', plugins_url('/js/jquery.cycletwo.js', __FILE__), array('jquery') );
 	wp_enqueue_script( 'cycletwo-addons', plugins_url('/js/jquery.cycletwo.addons.js', __FILE__), array('jquery', 'cycletwo') );
 	wp_enqueue_style( 'testimonial-rotator-style', plugins_url('/testimonial-rotator-style.css', __FILE__) ); 
+
+	$hide_font_awesome = get_option( 'testimonial-rotator-hide-fontawesome' );
+	$hide_font_awesome = ($hide_font_awesome == 1) ? true : false;
+
+	if( !$hide_font_awesome )
+	{
+		wp_enqueue_style( 'font-awesome', '//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css' );
+	}
 }
 
 
-/* CREATES THE CUSTOM POST TYPE */
+
+// REQUIRE FUNCTIONS
+if( is_admin() )
+{
+	require_once( TESTIMONIAL_ROTATOR_DIR . 'admin/admin-functions.php' );
+	require_once( TESTIMONIAL_ROTATOR_DIR . 'admin/admin-settings.php' );
+	require_once( TESTIMONIAL_ROTATOR_DIR . 'admin/metaboxes-testimonial.php' );
+	require_once( TESTIMONIAL_ROTATOR_DIR . 'admin/metaboxes-rotator.php' );
+}
+else
+{
+	require_once( TESTIMONIAL_ROTATOR_DIR . 'frontend-functions.php' );
+}
+
+
+
+// CREATES THE CUSTOM POST TYPE
 function testimonial_rotator_init() 
 {
 	// LOAD TEXT DOMAIN
@@ -105,10 +126,10 @@ function testimonial_rotator_init()
 					'hierarchical' 			=> false,
 					'menu_position' 		=> 26.6,
 					'exclude_from_search' 	=> true,
-					'supports' 				=> array( 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes' )
+					'supports' 				=> apply_filters( "testimonial_rotator_testimonial_supports", array( 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes' ) )
 					);
 					
-	register_post_type( 'testimonial', $args );
+	register_post_type( 'testimonial', apply_filters( 'testimonial_rotator_pt_args', $args ) );
 
 	// TESTIMONIAL ROTATOR CUSTOM POST TYPE
   	$labels = array(
@@ -140,312 +161,288 @@ function testimonial_rotator_init()
 					'hierarchical' 			=> false,
 					'menu_position' 		=> 26.7,
 					'exclude_from_search' 	=> true,
-					'supports' 				=> array( 'title' )
+					'supports' 				=> apply_filters( "testimonial_rotator_supports", array( 'title' ) ),
+					'show_in_menu'  		=> 'edit.php?post_type=testimonial',
 					);
 					
-	register_post_type( 'testimonial_rotator', $args );
+	register_post_type( 'testimonial_rotator', apply_filters( 'testimonial_rotator_pt_rotator_args', $args )  );
 }
 
 
-/* ADDS META BOXES TO THE ADD NEW TESTIMONIAL PAGE */
-function testimonial_rotator_create_metaboxes() 
+// ON INSTALL FLUSH REWRITES FOR OUR NEW PERMALINKS
+function testimonial_rotator_activate() 
 {
-	// TESTIMONIAL OPTIONS
-	add_meta_box( 'testimonial_rotator_metabox_select', __('Testimonial Options', 'testimonial_rotator'), 'testimonial_rotator_metabox_select', 'testimonial', 'normal', 'default' );
-	
-	// TESTIMONIAL IMAGE
-	add_meta_box( 'postimagediv', __('Testimonial Image', 'testimonial_rotator'), 'post_thumbnail_meta_box', 'testimonial', 'normal', 'default');
-	
-	// TESTIMONIAL ORDER
-	add_meta_box( 'pageparentdiv', __('Testimonial Order', 'testimonial_rotator'), 'page_attributes_meta_box', 'testimonial', 'normal', 'default');
-	
-	// IF ON EDIT SHOW THE SHORTCODE
-	if(isset($_GET['action']) AND $_GET['action'] == "edit")
-	{
-		add_meta_box( 'testimonial_rotator_shortcode_metabox', __('Rotator Shortcode', 'testimonial_rotator'), 'testimonial_rotator_shortcode_metabox', 'testimonial_rotator', 'normal', 'default' );
-	}
-	
-	// ROTATOR OPTIONS
-	add_meta_box( 'testimonial_rotator_metabox_effects', __('Rotator Options', 'testimonial_rotator'), 'testimonial_rotator_metabox_effects', 'testimonial_rotator', 'normal', 'default' );
-	
+	flush_rewrite_rules();
 }
+register_activation_hook( __FILE__, 'testimonial_rotator_activate' );
 
 
-/* MAIN TESTIMONIAL META BOX (SELECT BOX OF ROTATORS) */
-function testimonial_rotator_metabox_select() 
+// CREATE AND RETURN PIPED ROTATOR IDS
+function testimonial_rotator_make_piped_string( $arr )
 {
-	global $post;	
-	$rotator_id	= get_post_meta( $post->ID, '_rotator_id', true ); 
-	
-	$rotators = get_posts( array( 'post_type' => 'testimonial_rotator', 'numberposts' => -1, 'orderby' => 'title', 'order' => 'ASC' ) );
-?>
-	<?php if(!count($rotators)) { ?>
-		<p style="color: red;">
-			<b><?php _e('No Testimonial Rotators have been created.', 'testimonial_rotator'); ?></b><br />
-			<?php _e("You need to publish this testimonial so you don't lose your work and then go create a Testimonial Rotator. You can then edit this testimonial and select the rotator here.", "testimonial_rotator"); ?>
-		</p>
-	<?php } else { ?>
-		<p>
-		<?php _e('Attach to Rotator: ', 'testimonial_rotator'); ?> 
-		<select name="rotator_id">
-			<?php foreach($rotators as $rotator) { ?>
-			<option value="<?php echo $rotator->ID ?>" <?php if($rotator->ID == $rotator_id) echo " SELECTED"; ?>><?php echo $rotator->post_title ?></option>
-			<?php } ?>
-		</select>
-	</p>
-	<?php } ?>
-<?php }
-
-
-/* SHORTCODE DISPLAY HELPER */
-function testimonial_rotator_shortcode_metabox()
-{
-	global $post;
-	
-	echo '
-		<b>Base Rotator</b><br />
-		[testimonial_rotator id="' . $post->ID . '"] or [testimonial_rotator id="' . $post->post_name . '"]<br /><br />
-		
-		<b>List All Testimonials</b><br />
-		[testimonial_rotator id="' . $post->ID . '" format="list"]<br /><br />
-		
-		<b>Limit Results to 10</b><br />
-		[testimonial_rotator id="' . $post->post_name . '" format="list" limit="10"]<br /><br />
-			
-		<b>Hide Titles</b><br />
-		[testimonial_rotator id="' . $post->post_name . '" hide_title="1"]<br /><br />
-		
-		<b>Randomize Testimonials</b><br />
-		[testimonial_rotator id="' . $post->post_name . '" shuffle="1"]<br /><br />	
-	';
-	
-	echo '<span class="description">' . __('Put one of the above codes wherever you want the testimonials to appear', 'testimonial_rotator') . '</span>';	
+	return "|" . implode("|", (array) $arr) . "|";
 }
-
-
-/* TESTIMONIAL ROTATOR EFFECTS AND TIMING */
-function testimonial_rotator_metabox_effects()
+function testimonial_rotator_break_piped_string( $arr )
 {
-	global $post;
-	$timeout		= (int) get_post_meta( $post->ID, '_timeout', true );
-	$fx				= get_post_meta( $post->ID, '_fx', true );
-	
-	$available_effects = array('fade', 'scrollHorz', 'scrollVert',  'none');
-	
-	if(!$timeout) { $timeout = 5; }
-	?>
-	
-	<p>
-		<?php _e('Seconds per Testimonial:', 'testimonial_rotator'); ?>
-		<input type="text" style="width: 45px; text-align: center;" name="timeout" value="<?php echo esc_attr( $timeout ); ?>" maxlength="2" /></p>
-	</p>
-	<p>
-		<?php _e('Transition Effect:', 'testimonial_rotator'); ?>
-		<select name="fx">
-			<?php foreach($available_effects as $available_effect) { ?>
-			<option value="<?php echo $available_effect ?>" <?php if($available_effect == $fx) echo " SELECTED"; ?>><?php echo $available_effect ?></option>
-			<?php } ?>
-		</select>
-	</p>	
-	<?php	
-}
-
-/* ROTATOR SUBMENU PAGE */
-function register_testimonial_rotator_submenu_page()
-{
-	add_submenu_page( 'edit.php?post_type=testimonial', __('Rotators', 'testimonial_rotator'), __('Rotators', 'testimonial_rotator'), 'manage_options', 'edit.php?post_type=testimonial_rotator' ); 
-	add_submenu_page( 'edit.php?post_type=testimonial', __('Add New', 'testimonial_rotator'), __('Add New', 'testimonial_rotator'), 'manage_options', 'post-new.php?post_type=testimonial_rotator' ); 
-}
-
-
-/* SAVE TESTIMONIAL META DATA */
-function testimonial_rotator_save_testimonial_meta( $post_id, $post ) 
-{
-	global $post;  
-	if( isset( $_POST ) && isset( $post->ID ) && get_post_type( $post->ID ) == "testimonial" )  
-    {  
-		// SAVE
-		if ( isset( $_POST['rotator_id'] ) ) { update_post_meta( $post_id, '_rotator_id', strip_tags( $_POST['rotator_id'] ) ); }
-	}
-}
-
-
-/* SAVE TESTIMONIAL ROTATOR META DATA */
-function testimonial_rotator_save_rotator_meta( $post_id, $post ) 
-{
-	global $post;  
-	if( isset( $_POST ) && isset( $post->ID ) && get_post_type( $post->ID ) == "testimonial_rotator" )  
-    {  
-		// SAVE
-		if ( isset( $_POST['fx'] ) ) { update_post_meta( $post_id, '_fx', strip_tags( $_POST['fx'] ) ); }
-		if ( isset( $_POST['timeout'] ) ) { update_post_meta( $post_id, '_timeout', strip_tags( $_POST['timeout'] ) ); }
-	}
-}
-
-
-/* ADMIN COLUMNS IN LIST VIEW */
-function testimonial_rotator_columns( $columns ) 
-{
-	$columns = array(
-		'cb'       => '<input type="checkbox" />',
-		'image'    => __('Image', 'testimonial_rotator'),
-		'title'    => __('Title', 'testimonial_rotator'),
-		'ID'       => __('Rotator', 'testimonial_rotator'),
-		'order'    => __('Order', 'testimonial_rotator'),
-		'date'     => __('Date', 'testimonial_rotator')
-	);
-
-	return $columns;
-}
-function testimonial_rotator_column_sort($columns)
-{
-	$columns = array(
-		'title'    => __('Title', 'testimonial_rotator'),
-		'ID'       => __('Rotator', 'testimonial_rotator'),
-		'date'     => __('Date', 'testimonial_rotator')
-	);
-
-	return $columns;
-}
-function testimonial_rotator_add_columns( $column ) 
-{
-	global $post;
-	$edit_link = get_edit_post_link( $post->ID );
-
-	if ( $column == 'ID' ) 		{ echo get_the_title( get_post_meta( $post->ID, "_rotator_id", true ) ); }
-	if ( $column == 'image' ) 	echo '<a href="' . $edit_link . '" title="' . $post->post_title . '">' . get_the_post_thumbnail( $post->ID, array( 50, 50 ), array( 'title' => trim( strip_tags(  $post->post_title ) ) ) ) . '</a>';
-	if ( $column == 'order' ) 	echo '<a href="' . $edit_link . '">' . $post->menu_order . '</a>';
-}
-
-function testimonial_rotator_rotator_columns( $columns ) 
-{
-	$columns = array(
-		'cb'       		=> '<input type="checkbox" />',
-		'title'    		=> __('Title', 'testimonial_rotator'),
-		'slug'    		=> __('Slug', 'testimonial_rotator'),
-		'shortcode'		=> __('Shortcodes', 'testimonial_rotator')
-	);
-
-	return $columns;
-}
-
-function testimonial_rotator_rotator_add_columns( $column ) 
-{
-	global $post;
-	if ( $column == 'shortcode' )  	{ 	echo '
-												<b>Base Rotator</b><br />
-												[testimonial_rotator id="' . $post->ID . '"] or [testimonial_rotator id="' . $post->post_name . '"]<br /><br />
-												
-												<b>List All Testimonials</b><br />
-												[testimonial_rotator id="' . $post->ID . '" format="list"]<br /><br />
-												
-												<b>Limit Results to 10</b><br />
-												[testimonial_rotator id="' . $post->post_name . '" format="list" limit="10"]<br /><br />
-													
-												<b>Hide Titles</b><br />
-												[testimonial_rotator id="' . $post->post_name . '" hide_title="1"]<br /><br />
-												
-												<b>Randomize Testimonials</b><br />
-												[testimonial_rotator id="' . $post->post_name . '" shuffle="1"]<br /><br />	
-											'; }
-	if ( $column == 'slug' ) { echo $post->post_name; }
-}
-
-
-function testimonial_rotator_admin_menu_highlight() 
-{
-	global $menu, $submenu, $parent_file, $submenu_file, $self, $post_type, $taxonomy;
-	
-	$to_highlight_types = array( 'testimonial_rotator' );
-	if ( isset( $post_type ) ) 
-	{
-		if ( in_array( $post_type, $to_highlight_types ) ) 
-		{
-			$submenu_file = 'edit.php?post_type=' . $post_type;
-			$parent_file  = 'edit.php?post_type=testimonial_rotator';
-		}
-	}
+	return array_filter( explode("|", (string) $arr), 'strlen' );
 }
 
 
 
-/* SHORTCODE */
-function testimonial_rotator_shortcode($atts)
+// SHORTCODE
+function testimonial_rotator_shortcode( $atts )
 {
-	$rotator = testimonial_rotator($atts);
-	return $rotator;
+	return get_testimonial_rotator( $atts );
 }
 
 
 
-/* MEAT & POTATOES OF THE ROTATOR */
+// GET A ROTATOR (YOU CAN USE THIS, ALSO USED BY SHORTCODE
+function get_testimonial_rotator( $atts )
+{
+	ob_start();
+	testimonial_rotator( $atts );
+	$output = ob_get_contents();
+	ob_end_clean();
+	return $output;
+}
+
+
+
+// MEAT & POTATOES OF THE ROTATOR
 function testimonial_rotator($atts)
 {
-	$id 				= isset($atts['id']) ? $atts['id'] : "";
-	$show_title 		= isset($atts['hide_title']) ? false : true;
-	$format				= isset($atts['format']) ? $atts['format'] : "rotator";
-	$post_count			= isset($atts['limit']) ? (int) $atts['limit'] : -1;
-	$shuffle			= (isset($atts['shuffle']) AND $atts['shuffle'] == 1) ? 1 : 0;
-	
-	// IF ID IS NOT NUMERIC CHECK FOR SLUG
-	if(!is_numeric($id))
+	global $wp_query;
+
+
+	// GET ID 
+	$id = isset($atts['id']) ? $atts['id'] : false;
+
+
+	// GET ROTATOR
+	if( $id )
 	{
-		$rotator = get_page_by_path( $id, null, 'testimonial_rotator' );
-		if(!$rotator) return;
-		$id = $rotator->ID;
+		$rotator = get_post( $id );
+		if( !$rotator ) testimonial_rotator_error( sprintf( __('Rotator could not be found with ID: %d', 'testimonial_rotator' ), $id ) );
+	
+		// ROTATOR SLUG
+		$rotator_slug = $rotator->post_name;
+	}
+	else
+	{
+		$rotator_slug = "all";
 	}
 	
-	$timeout		= (int) get_post_meta( $id, '_timeout', true );
-	$timeout 		= round($timeout * 1000);
-	$fx				= get_post_meta( $id, '_fx', true );
 	
-	$order_by = ($shuffle) ? "rand" : "menu_order";
-
-	$testimonials_args = array( 'post_type' => 'testimonial', 'order' => 'ASC', 'orderby' => $order_by, 'meta_key' => '_rotator_id', 'meta_value' => $id, 'posts_per_page' => $post_count );
-
-	$testimonials = new WP_Query( apply_filters( 'testimonial_rotator_display_args', $testimonials_args ) );
-
-	$rtn = "";
-
-	if ( $testimonials->have_posts() )
+	// GET OVERRIDE SETTINGS FROM WIDGET OR SHORTCODE
+	$extra_classes	 	= isset($atts['extra_classes']) ? $atts['extra_classes'] : "";
+	$timeout 			= (int) isset($atts['timeout']) ? $atts['timeout'] : false;
+	$speed 				= (int) isset($atts['speed']) ? $atts['speed'] : false;
+	$fx 				= (int) isset($atts['fx']) ? $atts['fx'] : false;
+	$shuffle 			= (isset($atts['shuffle']) AND $atts['shuffle'] == 1) ? 1 : 0;
+	$post_count			= isset($atts['limit']) ? (int) $atts['limit'] : false;
+	$format				= isset($atts['format']) ? $atts['format'] : "rotator";
+	$show_title 		= isset($atts['hide_title']) ? false : true;
+	$is_widget 			= isset($atts['is_widget']) ? true : false;
+	$show_size 			= (isset($atts['show_size']) AND $atts['show_size'] == "excerpt") ? "excerpt" : "full";
+	$title_heading 		= (isset($atts['title_heading'])) ? $atts['title_heading'] : apply_filters('testimonial_rotator_title_heading', 'h2');
+	$show_microdata		= (isset($atts['hide_microdata'])) ? false : true;
+	$auto_height		= (isset($atts['auto_height'])) ? $atts['auto_height'] : apply_filters('testimonial_rotator_auto_height', 'calc');
+	$vertical_align		= (isset($atts['vertical_align']) AND $atts['vertical_align'] == 1) ? 1 : 0;
+	$div_selector		= (isset($atts['div_selector'])) ? $atts['div_selector'] : apply_filters('testimonial_rotator_div_selector', '> div.slide');
+	$pause_on_hover		= (isset($atts['no_pause_on_hover'])) ? 'false' : 'true';
+	$hide_image			= (isset($atts['hide_image'])) ? true : false;
+	$prev_next			= (isset($atts['prev_next'])) ? true : false;
+	$paged				= (isset($atts['paged'])) ? true : false;
+	$template_name		= (isset($atts['template'])) ? $atts['template'] : 'default';
+	
+	
+	// SET DEFAULT SETTINGS IF NOT SET
+	if(!$timeout) 			{ $timeout 			= (int) get_post_meta( $id, '_timeout', true ); }
+	if(!$speed) 			{ $speed 			= (int) get_post_meta( $id, '_speed', true ); }
+	if(!$fx)				{ $fx 				= get_post_meta( $id, '_fx', true ); }
+	if(!$shuffle)			{ $shuffle 			= get_post_meta( $id, '_shuffle', true ); }
+	if(!$vertical_align)	{ $vertical_align 	= get_post_meta( $id, '_verticalalign', true ); }
+	if(!$hide_image)		{ $hide_image 		= get_post_meta( $id, '_hidefeaturedimage', true ); }
+	if(!$prev_next)			{ $prev_next 		= get_post_meta( $id, '_prevnext', true ); }
+	if(!$post_count)		{ $post_count 		= (int) get_post_meta( $id, '_limit', true ); }
+	if(!$template_name)		{ $template_name 	= get_post_meta( $id, '_template', true ); }
+	if( $show_microdata )
 	{
-		$addClass = ($format == "rotator") ? "cycletwo-slideshow"  : "";
+		$hide_microdata = get_post_meta( $id, '_hide_microdata', true );
+		$show_microdata = $hide_microdata ? false: true;
+	}
 	
-		$rtn .= "<div class=\"testimonial_rotator_wrap\">\n";
-		$rtn .= "	<div id=\"testimonial_rotator_{$id}\" class=\"testimonial_rotator $addClass\" data-cycletwo-fx=\"{$fx}\" data-cycletwo-auto-height=\"calc\" data-cycletwo-slides=\"> div.slide\" data-cycletwo-timeout=\"{$timeout}\" data-cycletwo-speed=\"750\" data-cycletwo-pause-on-hover=\"#testimonial_rotator_{$id}\">\n";
+	
+	// SANATIZE SETTINGS
+	$timeout 		= round($timeout * 1000);
+	$speed 			= round($speed * 1000);
+	$post_count     = (!$post_count) ? -1 : $post_count;
+	if( $format != "rotator" ) $prev_next = false;
+	
+	
+	// IF ID, QUERY FOR JUST THAT ROTATOR
+	$meta_query = array();
+	if( $id )
+	{
+		$meta_query = array( 'relation' => 'OR',
+										array(
+											'key' 		=> '_rotator_id',
+											'value' 	=> $id
+										),
+										array(
+											'key' 		=> '_rotator_id',
+											'value' 	=> '|' . $id . '|',
+											'compare'	=> 'LIKE'
+										));
+	}
+	
+	
+	// GET TESTIMONIALS
+	$order_by = ($shuffle) ? "rand" : "menu_order";
+	$testimonials_args = array( 
+								'post_type' => 'testimonial', 
+								'order' => 'ASC', 
+								'orderby' => $order_by,
+								'posts_per_page' => $post_count,
+								'meta_query' => $meta_query
+							);
+							
+	if( $paged )
+	{
+		$paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
+		$testimonials_args['paged'] = $paged;
+	}
+							
+							
+	query_posts( apply_filters( 'testimonial_rotator_display_args', $testimonials_args ) );
+
+
+	// ROTATOR CLASSES
+	$cycle_class 						= ($format == "rotator") ? " cycletwo-slideshow" : "";
+	$rotator_class_prefix 				= ($is_widget) ? "_widget" : "";
+	if($extra_classes) $cycle_class 	.= " $cycle_class ";
+	$cycle_class 						.= " format-{$format}";
+	$cycle_class 						.= " template-{$template_name}";
+	$extra_wrap_class 					= "";
+	
+	// VERTICAL ALIGN
+	$centered = "";
+	if($vertical_align)
+	{
+		$centered = " data-cycletwo-center-horz=\"true\" data-cycletwo-center-vert=\"true\" ";
+	}
+	
+	
+	// PREV/NEXT BUTTON
+	$prevnextdata 	= "";
+	if( $prev_next )
+	{
+		$prevnextdata = " data-cycletwo-next=\"#testimonial_rotator{$rotator_class_prefix}_wrap_{$id} .testimonial_rotator_next\" data-cycletwo-prev=\"#testimonial_rotator{$rotator_class_prefix}_wrap_{$id} .testimonial_rotator_prev\" ";
+		$extra_wrap_class .= " with-prevnext ";
+
+		// PREV / NEXT FONT AWESOME ICONS, FILTER READY
+		if( $fx == "scrollVert")
+		{
+			$prev_fa_icon 	= apply_filters( 'testimonial_rotator_fa_icon_prev_vert', 'fa-chevron-down' );
+			$next_fa_icon 	= apply_filters( 'testimonial_rotator_fa_icon_next_vert', 'fa-chevron-up' );
+		}
+		else
+		{
+			$prev_fa_icon 	= apply_filters( 'testimonial_rotator_fa_icon_prev', 'fa-chevron-left' );
+			$next_fa_icon 	= apply_filters( 'testimonial_rotator_fa_icon_next', 'fa-chevron-right' );
+		}
+	}
+	
+	
+	// SWIPE FILTER
+	$touch_swipe = apply_filters( 'testimonial_rotator_swipe', 'true' );
+	
+	$global_rating = 0;
+
+	if ( have_posts() )
+	{
+		echo "<div id=\"testimonial_rotator{$rotator_class_prefix}_wrap_{$id}\" class=\"testimonial_rotator{$rotator_class_prefix}_wrap{$extra_wrap_class}\">\n";
+		echo "	<div id=\"testimonial_rotator{$rotator_class_prefix}_{$id}\" class=\"testimonial_rotator hreview-aggregate{$rotator_class_prefix}{$cycle_class}\" data-cycletwo-pause-on-hover=\"{$pause_on_hover}\" {$centered} data-cycletwo-swipe=\"{$touch_swipe}\" data-cycletwo-fx=\"{$fx}\" data-cycletwo-auto-height=\"{$auto_height}\" {$prevnextdata}data-cycletwo-slides=\"{$div_selector}\">\n";
 		
 		do_action( 'testimonial_rotator_slides_before' );
-		
-		while ( $testimonials->have_posts() )
-		{
-			$testimonials->the_post();
-				
-			$slide = "<div class=\"slide cf-tr\">\n";
-			
-			if($show_title) $slide .= "	<h2>" . get_the_title() . "</h2>\n";
-			
-			if ( has_post_thumbnail() )
-			{ 
-				$slide .= "	<div class=\"img\">" . get_the_post_thumbnail( get_the_ID(), 'thumbnail') . "</div>\n"; 
-			}
-			$slide .= "	<div class=\"text\">" . apply_filters( 'the_content', get_the_content() ) . "</div>\n";
-			$slide .= "</div>\n";
 
-			$rtn .= apply_filters( 'testimonial_rotator_slide', $slide );
+		$slide_count = 1;
+		while ( have_posts() )
+		{
+			the_post();
+			
+			// HAS IMAGE, CAN BE HIDDEN IN ROTATOR SETTINGS
+			$has_image = has_post_thumbnail() ? "has-image" : false;
+			if( $hide_image ) $has_image = false;
+			
+			// DATA
+			$itemreviewed 		= get_post_meta( $id, '_itemreviewed', true );
+			$cite 				= get_post_meta( get_the_ID(), '_cite', true );
+			$rating 			= (int) get_post_meta( get_the_ID(), '_rating', true );
+			
+			// LOOK FOR TEMPLATE IN THEME
+			$template = locate_template( array( "loop-testimonial-{$rotator_slug}.php", "loop-testimonial-{$id}.php", "loop-testimonial.php" ) );
+			
+			// LOOK IN PLUGIN
+			if( !$template )
+			{
+				$template = dirname(__FILE__) . "/templates/loop-testimonial.php";
+			}			
+			
+			// LOAD TEMPLATE
+			if( $template )
+			{
+				include( $template );
+			}
+			
+			// SLIDE COUNTER
+			$slide_count++;
 		}
 		
+		
+		// GLOBAL RATING
+		$post_count = $wp_query->post_count;
+		$global_rating_number = floor($global_rating / $post_count);
+		
+		if( $global_rating_number AND $show_microdata )
+		{
+			echo "<div class=\"testimonial_rotator_microdata\">\n";
+			echo "\t<div class=\"rating\">{$global_rating_number}.0</div>\n";
+			echo "\t<div class=\"count\">{$post_count}</div>\n";
+			echo "</div>\n";
+		}
+
 		do_action( 'testimonial_rotator_after' );
 		
-		$rtn .= "</div>\n</div>\n\n";
+		echo "</div> <!-- #testimonial_rotator{$rotator_class_prefix}_{$id} -->\n";
+		
+		// PREVIOUS / NEXT
+		if( $prev_next AND $post_count > 1)
+		{
+			echo "<div class=\"testimonial_rotator_nav\">";
+				echo "	<div class=\"testimonial_rotator_prev\"><i class=\"fa {$prev_fa_icon}\"></i></div>";
+				echo "	<div class=\"testimonial_rotator_next\"><i class=\"fa {$next_fa_icon}\"></i></div>";
+			echo "</div>\n";
+		}
+		
+		echo "</div><!-- .testimonial_rotator{$rotator_class_prefix}_wrap -->\n\n";
+	}
+	
+	if( $paged )
+	{
+		echo "<div class=\"testimonial_rotator_paged cf-tr\">";
+			next_posts_link( __('Next Testimonials', 'testimonial_rotator') . ' <i class="fa fa-angle-double-right"></i>' );
+			previous_posts_link( '<i class="fa fa-angle-double-left"></i> ' . __('Previous Testimonials', 'testimonial_rotator') );
+		echo "</div>\n";
 	}
 	
 	wp_reset_postdata();
 	wp_reset_query();
-	return $rtn;
 }
 
 
-/* WIDGET */
+// WIDGET
 class TestimonialRotatorWidget extends WP_Widget
 {
 	function TestimonialRotatorWidget()
@@ -468,12 +465,12 @@ class TestimonialRotatorWidget extends WP_Widget
 		$show_size 		= (isset($instance['show_size']) AND $instance['show_size'] == "full") ? "full" : "excerpt";
 		
 	?>
-		<p><label for="<?php echo $this->get_field_id('title'); ?>">Title: <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($title); ?>" /></label></p>
+		<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:', 'testimonial_rotator'); ?> <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($title); ?>" /></label></p>
 	
 		<p>
-		<label for="<?php echo $this->get_field_id('rotator_id'); ?>">Rotator:
+		<label for="<?php echo $this->get_field_id('rotator_id'); ?>"><?php _e('Rotator', 'testimonial_rotator'); ?>:
 		<select name="<?php echo $this->get_field_name('rotator_id'); ?>" class="widefat" id="<?php echo $this->get_field_id('rotator_id'); ?>">
-			<option value="">All Rotators</option>
+			<option value=""><?php _e('All Rotators', 'testimonial_rotator'); ?></option>
 			<?php foreach($rotators as $rotator) { ?>
 			<option value="<?php echo $rotator->ID ?>" <?php if($rotator->ID == $rotator_id) echo " SELECTED"; ?>><?php echo $rotator->post_title ?></option>
 			<?php } ?>
@@ -481,24 +478,25 @@ class TestimonialRotatorWidget extends WP_Widget
 		</label>
 		</p>
 		
-		<p><label for="<?php echo $this->get_field_id('limit'); ?>">Limit: <input class="widefat" id="<?php echo $this->get_field_id('limit'); ?>" name="<?php echo $this->get_field_name('limit'); ?>" type="text" value="<?php echo esc_attr($limit); ?>" /></label></p>
-	
-		
+		<p><label for="<?php echo $this->get_field_id('limit'); ?>"><?php _e('Limit:', 'testimonial_rotator'); ?> <input class="widefat" id="<?php echo $this->get_field_id('limit'); ?>" name="<?php echo $this->get_field_name('limit'); ?>" type="text" value="<?php echo esc_attr($limit); ?>" /></label></p>
+
 		<p>
-			<label for="<?php echo $this->get_field_id('format'); ?>">Display</label>: &nbsp;
-			<input id="<?php echo $this->get_field_id('format'); ?>" name="<?php echo $this->get_field_name('format'); ?>" value="rotator" type="radio"<?php if($format != "list") echo " checked='checked'"; ?>> Rotator &nbsp;
-			<input id="<?php echo $this->get_field_id('format'); ?>" name="<?php echo $this->get_field_name('format'); ?>" value="list" type="radio"<?php if($format == "list") echo " checked='checked'"; ?>> List
+			<label for="<?php echo $this->get_field_id('format'); ?>"><?php _e('Display:', 'testimonial_rotator'); ?></label> &nbsp;
+			<input id="<?php echo $this->get_field_id('format'); ?>" name="<?php echo $this->get_field_name('format'); ?>" value="rotator" type="radio"<?php if($format != "list") echo " checked='checked'"; ?>> <?php _e('Rotator', 'testimonial_rotator'); ?> &nbsp;
+			<input id="<?php echo $this->get_field_id('format'); ?>" name="<?php echo $this->get_field_name('format'); ?>" value="list" type="radio"<?php if($format == "list") echo " checked='checked'"; ?>> <?php _e('List', 'testimonial_rotator'); ?>
 		</p>		
 		
 		<p>
-			<label for="<?php echo $this->get_field_id('show_size'); ?>">Show as</label>: &nbsp;
-			<input id="<?php echo $this->get_field_id('show_size'); ?>" name="<?php echo $this->get_field_name('show_size'); ?>" value="full" type="radio"<?php if($show_size == "full") echo " checked='checked'"; ?>> Full &nbsp;
-			<input id="<?php echo $this->get_field_id('show_size'); ?>" name="<?php echo $this->get_field_name('show_size'); ?>" value="excerpt" type="radio"<?php if($show_size == "excerpt") echo " checked='checked'"; ?>> Excerpt
+			<label for="<?php echo $this->get_field_id('show_size'); ?>"><?php _e('Show as:', 'testimonial_rotator'); ?></label> &nbsp;
+			<input id="<?php echo $this->get_field_id('show_size'); ?>" name="<?php echo $this->get_field_name('show_size'); ?>" value="full" type="radio"<?php if($show_size == "full") echo " checked='checked'"; ?>> <?php _e('Full', 'testimonial_rotator'); ?>&nbsp;
+			<input id="<?php echo $this->get_field_id('show_size'); ?>" name="<?php echo $this->get_field_name('show_size'); ?>" value="excerpt" type="radio"<?php if($show_size == "excerpt") echo " checked='checked'"; ?>> <?php _e('Excerpt', 'testimonial_rotator'); ?>
 		</p>
+		
+		<hr>
 		
 		<p>
 			<input id="<?php echo $this->get_field_id('shuffle'); ?>" name="<?php echo $this->get_field_name('shuffle'); ?>" value="1" type="checkbox"<?php if($shuffle) echo " checked='checked'"; ?>>&nbsp;
-			<label for="<?php echo $this->get_field_id('shuffle'); ?>">Randomize Testimonials</label>
+			<label for="<?php echo $this->get_field_id('shuffle'); ?>"><?php _e('Randomize Testimonials', 'testimonial_rotator'); ?></label>
 		</p>
 		
 	<?php
@@ -510,7 +508,7 @@ class TestimonialRotatorWidget extends WP_Widget
 		$instance['title'] 			= $new_instance['title'];
 		$instance['rotator_id'] 	= $new_instance['rotator_id'];
 		$instance['format'] 		= $new_instance['format'];
-		$instance['shuffle'] 		= $new_instance['shuffle'] ? 1 : 0;
+		$instance['shuffle'] 		= isset($new_instance['shuffle']) ? 1 : 0;
 		$instance['show_size'] 		= $new_instance['show_size'];
 		$instance['limit'] 			= $new_instance['limit'];
 		return $instance;
@@ -522,110 +520,13 @@ class TestimonialRotatorWidget extends WP_Widget
 		
 		echo $before_widget;
 		
-		$title 			= empty($instance['title']) ? ' ' : apply_filters('widget_title', $instance['title']);
-		$rotator_id 	= (int) isset($instance['rotator_id']) ? $instance['rotator_id'] : false ;
-		$shuffle		= (isset($instance['shuffle']) AND $instance['shuffle'] == 1) ? 1 : 0;
-		$show_size 		= (isset($instance['show_size']) AND $instance['show_size'] == "full") ? "full" : "excerpt";
-		$limit 			= (int) isset($instance['limit']) ? $instance['limit'] : 5;
-		$format			= isset($instance['format']) ? $instance['format'] : "rotator";
-		
 		if (!empty($title)) { echo $before_title . $title . $after_title; }
-
-		$testimonials_args = array( 'post_type' => 'testimonial', 'orderby' => 'menu_order', 'posts_per_page' => $limit );
-
-		$fx = 'fade';
-		$timeout = 4000;
 		
-		if($rotator_id)
-		{
-			$testimonials_args['meta_key'] 		= '_rotator_id';
-			$testimonials_args['meta_value'] 	= $rotator_id;
-			
-			$rotator = get_page_by_path( $rotator_id, null, 'testimonial_rotator' );
-			
-			$timeout		= (int) get_post_meta( $rotator_id, '_timeout', true );
-			$timeout 		= round($timeout * 1000);
-			$fx				= get_post_meta( $rotator_id, '_fx', true );
-		}	
+		$instance['id'] = $instance['rotator_id'];
+		$instance['is_widget'] = true;
+		testimonial_rotator( $instance );
 		
-		if($shuffle)
-		{
-			$testimonials_args['orderby'] = 'rand';
-		}	
-		
-		$testimonials = new WP_Query( apply_filters( 'testimonial_rotator_widget_testimonial_args', $testimonials_args )  );
-		
-		$rtn = "";
-		
-		if ( $testimonials->have_posts() )
-		{
-			$addClass = ($format == "rotator") ? "cycletwo-slideshow"  : "";
-		
-			$rtn .= "<div class=\"testimonial_rotator_widget_wrap\">\n";
-			$rtn .= "	<div id=\"testimonial_rotator_widget_{$id}\" class=\"testimonial_rotator_widget {$addClass}\" data-cycletwo-fx=\"" . apply_filters( 'testimonial_rotator_widget_fx', $fx ) . "\" data-cycletwo-auto-height=\"calc\" data-cycletwo-slides=\"> div.slide\" data-cycletwo-timeout=\"" . apply_filters( 'testimonial_rotator_widget_timeout', $timeout ) . "\" data-cycletwo-speed=\"" . apply_filters( 'testimonial_rotator_widget_speed', 750 ) . "\" data-cycletwo-pause-on-hover=\"#testimonial_rotator_widget_{$id}\">\n";
-			
-			$template = "slide-widget";
-			
-			while ( $testimonials->have_posts() )
-			{
-				$testimonials->the_post();
-					
-				$slide = "<div class=\"slide\">\n";		
-				$slide .= "	<blockquote class=\"testimonial_rotator_widget_blockquote\">\n";
-				
-				if($show_size == "full")
-				{
-					$slide .= apply_filters('the_content', get_the_content());
-				}
-				else
-				{
-					$slide .= get_the_excerpt();
-				}
-				
-				$cite_title = get_the_title();
-				if($cite_title) $slide .= "	<cite>- {$cite_title}</cite>";
-				
-				$slide .= "	</blockquote>\n";
-				$slide .= "</div>\n";
-				
-				$rtn .= apply_filters( 'testimonial_rotator_widget_slide', $slide );
-			} 
-			
-			$rtn .= "</div>\n</div>\n\n";
-		}
-		
-		wp_reset_postdata();
-		wp_reset_query();
-		
-		echo $rtn;
 		echo $after_widget;
 	}
 }
 
-
-
-/* ADMIN ICON */
-function testimonial_rotator_cpt_icon() 
-{
-	global $wp_version;
-	
-	if($wp_version >= 3.8)
-	{
-		echo '
-			<style> 
-				#adminmenu #menu-posts-testimonial div.wp-menu-image:before { content: "\f205"; }
-			</style>
-		';	
-	}
-	else
-	{
-?>
-	<style type="text/css" media="screen">
-		#menu-posts-testimonial .wp-menu-image { background: url(<?php echo TESTIMONIAL_ROTATOR_URI . '/thumb-up.png'; ?>) no-repeat 6px -17px !important; }
-		#menu-posts-testimonial:hover .wp-menu-image, #menu-posts-testimonial.wp-has-current-submenu .wp-menu-image { background-position: 6px 7px!important; }	
-	</style>
-<?php 
-	}
-		
-}
-?>
