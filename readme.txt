@@ -16,6 +16,7 @@ Finally a really simple way to manage testimonials on your site. This plugin cre
 = Documentation =
 Help documents and code snippets can be viewed at http://halgatewood.com/docs/plugins/testimonial-rotator/
 
+= Version 2 Available Now = 
 Version 2 includes a big release full of awesome features like:
 
 * Change all rotator settings in the admin
