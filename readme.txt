@@ -61,6 +61,7 @@ When you are adding or editing the rotator, you have the ability to specify how 
 5. Testimonials have their own page and use the single template they can be customized by making a single-testimonial.php file in your theme.
 6. Testimonial widget on the new TwentyFourteen theme
 7. New Widget Options (version 1.3+)
+8. New settings area (version 2.0)
 
 
 
