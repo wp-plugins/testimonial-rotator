@@ -16,6 +16,7 @@ Finally a really simple way to manage testimonials on your site. This plugin cre
 It's designed with minimal CSS so it will blend with your theme and can easily be updated to match your theme.
 
 Version 2 includes a big release full of awesome features like:
+
 * Change all rotator settings in the admin
 * Add testimonials to multiple rotators
 * Prev/Next Buttons
