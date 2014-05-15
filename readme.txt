@@ -3,7 +3,7 @@ Contributors: halgatewood
 Donate link: http://halgatewood.com/donate/
 Tags: testimonials, sidebar, shortcode, testimonial, praise, homage, testimony, witness, appreciation, green light, rotator, rotators, for developers
 Requires at least: 3.5
-Tested up to: 3.8
+Tested up to: 3.9
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -13,80 +13,25 @@ Easily add Testimonials to your WordPress Blog or Company Website.
 == Description ==
 Finally a really simple way to manage testimonials on your site. This plugin creates a testimonial and a testimonial rotator custom post type, complete with WordPress admin fields for adding testimonials and assigning them to rotators for display. It includes a Widget and Shortcode to display the testimonials.
 
-It's designed with minimal CSS so it will blend with your theme and can easily be updated to match your theme by your developer.
+It's designed with minimal CSS so it will blend with your theme and can easily be updated to match your theme.
+
+Version 2 includes a big release full of awesome features like:
+* Change all rotator settings in the admin
+* Add testimonials to multiple rotators
+* Prev/Next Buttons
+* Vertical Align Testimonials based on Height
+* Star Ratings
+* Author information field
+* Testimonial single template
+* Ability to make custom templates (PRO Theme Pack coming soon)
+* hReview Support
+* Pagination in List Format
+* Ability to show the Add Rotator section based on User Role
+* New Settings section
+* New hooks
 
 = Documentation =
 Help documents and code snippets can be viewed at http://halgatewood.com/docs/plugins/testimonial-rotator/
-
-
-= Shortcode examples =
-Here are few ways you can include the rotator on your pages and posts.
-
-`Display Testimonials from All Rotators
-[testimonial_rotator]
-
-Display Testimonials in Rotator #407
-[testimonial_rotator id="407"]
-
-List All Testimonials in Rotator #407
-[testimonial_rotator id="407" format="list"]
-
-Limit Results to 10
-[testimonial_rotator id="407" format="list" limit=10]
-
-Hide Titles
-[testimonial_rotator id="407" hide_title=1]
-
-Randomize Testimonials
-[testimonial_rotator id="407" shuffle=1]`
-
-
-= Example Shortcode HTML =
-Here was what the html looks like so you can over ride the styles. Add the .wrap to your CSS selector to override the basic plugin styles.
-
-.testimonial_rotator_wrap .testimonial_rotator { background: red; }
-
-`
-<div class="testimonial_rotator_wrap">
-	<div id="testimonial_rotator_359" class="testimonial_rotator">
-		<div class="slide">
-			<h2>Post Title</h2>
-			<div class="img">Featured Image</div>
-			<div class="text"><p>Testimonial Content</p></div>
-		</div>
-		<div class="slide">
-			<h2>Post Title</h2>
-			<div class="img">Featured Image</div>
-			<div class="text"><p>Testimonial Content</p></div>
-		</div>
-	</div>
-</div>
-`
-
-
-= Example Widget HTML =
-The widget HTML is slightly different than the shortcode version. This allows you to style each one differently.
-
-`
-<h3 class="widget-title">Widget Title</h3>
-
-<div class="testimonial_rotator_widget_wrap">
-	<div id="testimonial_rotator_widget_sidebar-1" class="testimonial_rotator_widget">
-		<div class="slide">
-			<blockquote>
-				<p>Content</p>
-				<cite>- Post Title</cite>	
-			</blockquote>
-		</div>
-		<div class="slide">
-			<blockquote>
-				<p>Content</p>
-				<cite>- Post Title</cite>	
-			</blockquote>
-		</div>
-	</div>
-</div>
-`
 
 
 
@@ -101,9 +46,9 @@ The widget HTML is slightly different than the shortcode version. This allows yo
 
 == Frequently Asked Questions ==
 
+= How do I change the speed and transition of the rotator? =
 
-= I need more help, where do I go? =
-As stated before this plugin has minimal CSS and styling baked in. This allows you to adapt if for your site and theme. If you need some code snippets to enrich your functionality please visit: http://halgatewood.com/docs/plugins/testimonial-rotator/
+When you are adding or editing the rotator, you have the ability to specify how many seconds each testimonial should appear for. You can also choose from a handful of transitions there (like fades and wipes).
 
 
 
@@ -120,6 +65,24 @@ As stated before this plugin has minimal CSS and styling baked in. This allows y
 
 
 == Changelog ==
+
+= 2.0 =
+* Change all rotator settings in the admin
+* Add testimonials to multiple rotators
+* Prev / Next Buttons
+* Vertical Align Testimonials based on Height
+* Font Awesome
+* Star Ratings
+* Hide Featured Image
+* Author Cite Field
+* Testimonial single template
+* Ability to make custom templates (Theme Pack coming soon)
+* hReview Support
+* Pagination in List Format
+* Ability to show the Add Rotator section based on User Role
+* New Settings section
+* New hooks added
+* Code cleanup and more commenting
 
 = 1.4 =
 * Use shortcode to display testimonials from all rotators by not passing in an 'id' attribute
