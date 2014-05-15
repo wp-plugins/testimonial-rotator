@@ -13,7 +13,8 @@ Easily add Testimonials to your WordPress Blog or Company Website.
 == Description ==
 Finally a really simple way to manage testimonials on your site. This plugin creates a testimonial and a testimonial rotator custom post type, complete with WordPress admin fields for adding testimonials and assigning them to rotators for display. It includes a Widget and Shortcode to display the testimonials.
 
-It's designed with minimal CSS so it will blend with your theme and can easily be updated to match your theme.
+= Documentation =
+Help documents and code snippets can be viewed at http://halgatewood.com/docs/plugins/testimonial-rotator/
 
 Version 2 includes a big release full of awesome features like:
 
@@ -30,10 +31,6 @@ Version 2 includes a big release full of awesome features like:
 * Ability to show the Add Rotator section based on User Role
 * New Settings section
 * New hooks
-
-= Documentation =
-Help documents and code snippets can be viewed at http://halgatewood.com/docs/plugins/testimonial-rotator/
-
 
 
 == Installation ==
@@ -69,6 +66,7 @@ When you are adding or editing the rotator, you have the ability to specify how 
 == Changelog ==
 
 = 2.0 =
+Updated May 15, 2014
 * Change all rotator settings in the admin
 * Add testimonials to multiple rotators
 * Prev / Next Buttons
