@@ -7,7 +7,7 @@ Author: Hal Gatewood
 Author URI: http://www.halgatewood.com
 Text Domain: testimonial_rotator
 Domain Path: /languages
-Version: 2.0.1
+Version: 2.0.2
 */
 
 
@@ -363,7 +363,7 @@ function testimonial_rotator($atts)
 	if ( have_posts() )
 	{
 		echo "<div id=\"testimonial_rotator{$rotator_class_prefix}_wrap_{$id}\" class=\"testimonial_rotator{$rotator_class_prefix}_wrap{$extra_wrap_class}\">\n";
-		echo "	<div id=\"testimonial_rotator{$rotator_class_prefix}_{$id}\" class=\"testimonial_rotator hreview-aggregate{$rotator_class_prefix}{$cycle_class}\" data-cycletwo-pause-on-hover=\"{$pause_on_hover}\" {$centered} data-cycletwo-swipe=\"{$touch_swipe}\" data-cycletwo-fx=\"{$fx}\" data-cycletwo-auto-height=\"{$auto_height}\" {$prevnextdata}data-cycletwo-slides=\"{$div_selector}\">\n";
+		echo "	<div id=\"testimonial_rotator{$rotator_class_prefix}_{$id}\" class=\"testimonial_rotator hreview-aggregate{$rotator_class_prefix}{$cycle_class}\" data-cycletwo-timeout=\"{$timeout}\" data-cycletwo-speed=\"{$speed}\" data-cycletwo-pause-on-hover=\"{$pause_on_hover}\" {$centered} data-cycletwo-swipe=\"{$touch_swipe}\" data-cycletwo-fx=\"{$fx}\" data-cycletwo-auto-height=\"{$auto_height}\" {$prevnextdata}data-cycletwo-slides=\"{$div_selector}\">\n";
 		
 		do_action( 'testimonial_rotator_slides_before' );
 
@@ -388,7 +388,7 @@ function testimonial_rotator($atts)
 			if( !$template )
 			{
 				$template = dirname(__FILE__) . "/templates/loop-testimonial.php";
-			}			
+			}
 			
 			// LOAD TEMPLATE
 			if( $template )
@@ -455,8 +455,6 @@ class TestimonialRotatorWidget extends WP_Widget
 	{
 		$rotators = get_posts( array( 'post_type' => 'testimonial_rotator', 'numberposts' => -1, 'orderby' => 'title', 'order' => 'ASC' ) );
 		
-		$instance = wp_parse_args( (array) $instance, array( 'title' => '' ) );
-		
 		$title 			= isset($instance['title']) ? $instance['title'] : "";
 		$rotator_id 	= isset($instance['rotator_id']) ? $instance['rotator_id'] : 0;
 		$format			= isset($instance['format']) ? $instance['format'] : "rotator";
@@ -518,12 +516,13 @@ class TestimonialRotatorWidget extends WP_Widget
 	{
 		extract($args, EXTR_SKIP);
 		
+		$widget_title 		= isset($instance['title']) ? $instance['title'] : false;
 		echo $before_widget;
 		
-		if (!empty($title)) { echo $before_title . $title . $after_title; }
+		if ( $widget_title ) { echo $before_title . $widget_title . $after_title; }
 		
-		$instance['id'] = $instance['rotator_id'];
-		$instance['is_widget'] = true;
+		$instance['id'] 			= $instance['rotator_id'];
+		$instance['is_widget'] 		= true;
 		testimonial_rotator( $instance );
 		
 		echo $after_widget;

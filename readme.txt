@@ -66,6 +66,11 @@ When you are adding or editing the rotator, you have the ability to specify how 
 
 == Changelog ==
 
+= 2.0.2 =
+Updated May 20, 2014
+* Fixed Widget Title
+* Fixed rotator timeout and transition speed
+
 = 2.0.1 =
 Updated May 15, 2014
 * Added wrapper div around quote part of testimonial
