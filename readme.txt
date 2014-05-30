@@ -66,17 +66,18 @@ When you are adding or editing the rotator, you have the ability to specify how 
 
 == Changelog ==
 
-= 2.0.2 =
-Updated May 20, 2014
+= 2.0.3 - Updated May 30, 2014 =
+* Added thumbnail setting for Rotator
+* Wrapped Init functions with is_admin for the Admin only hooks
+
+= 2.0.2 - Updated May 20, 2014 =
 * Fixed Widget Title
 * Fixed rotator timeout and transition speed
 
-= 2.0.1 =
-Updated May 15, 2014
+= 2.0.1 - May 15, 2014 =
 * Added wrapper div around quote part of testimonial
 
-= 2.0 =
-Updated May 15, 2014
+= 2.0 -  May 15, 2014 =
 * Change all rotator settings in the admin
 * Add testimonials to multiple rotators
 * Prev / Next Buttons

@@ -187,3 +187,68 @@ function testimonial_rotator_plugin_action_links( $links, $file )
 }
 add_filter( 'plugin_action_links', 'testimonial_rotator_plugin_action_links', 10, 2 );
 
+
+// MEDIA BUTTON
+function testimonial_rotator_button() 
+{
+	global $pagenow, $typenow, $wp_version;
+	$output = '';
+	if ( version_compare( $wp_version, '3.5', '>=' ) AND in_array( $pagenow, array( 'post.php', 'page.php', 'post-new.php', 'post-edit.php' ) ) && $typenow != 'testimonial' ) 
+	{
+		$img = '<style>#testimonial-rotator-media-button::before { font: 400 18px/1 dashicons; content: \'\f205\'; }</style><span class="wp-media-buttons-icon" id="testimonial-rotator-media-button"></span>';
+		$output = '<a href="#TB_inline?width=640&inlineId=add-testimonial-rotator" class="thickbox button testimonial-rotator-thickbox" title="' .  __( 'Add Rotator', 'testimonial_rotator'  ) . '" style="padding-left: .4em;"> ' . $img . __( 'Add Rotator', 'testimonial_rotator'  ) . '</a>';
+	}
+	echo $output;
+}
+add_action( 'media_buttons', 'testimonial_rotator_button', 11 );
+
+
+// MEDIA BUTTON FUNCTIONALITY
+function testimonial_rotator_admin_footer_for_thickbox() 
+{
+	global $pagenow, $typenow, $wp_version;
+
+	// Only run in post/page creation and edit screens
+	if ( version_compare( $wp_version, '3.5', '>=' ) AND in_array( $pagenow, array( 'post.php', 'page.php', 'post-new.php', 'post-edit.php' ) ) && $typenow != 'testimonial' ) { ?>
+		<script type="text/javascript">
+            function insertTestimonialRotator() 
+            {
+            	var id = jQuery('#testimonial-rotator-select-box').val();
+                if ('' === id)
+                {
+                    alert('<?php _e( "You must choose a rotator", "testimonial_rotator" ); ?>');
+                    return;
+                }
+                window.send_to_editor('[testimonial_rotator id="' + id + '"]');
+            }
+		</script>
+
+		<div id="add-testimonial-rotator" style="display: none;">
+			<div class="wrap" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+
+				<?php
+				
+				$rotators = get_posts( array( 'post_type' => 'testimonial_rotator', 'numberposts' => -1, 'orderby' => 'title', 'order' => 'ASC' ) );
+				
+				if( $rotators ) { ?>
+					<select id="testimonial-rotator-select-box" style="clear: both; display: block; margin-bottom: 1em;">
+						<option value=""><?php _e('Choose a Rotator', 'testimonial_rotator'); ?></option>
+						<?php
+							foreach ( $rotators as $rotator ) 
+							{
+								echo '<option value="' . $rotator->ID . '">' . $rotator->post_title . '</option>';
+							}
+						?>
+					</select>
+				<?php } else { echo __('No rotators have been created yet. Please create one first and then you will be able to select it here.', 'testimonial_Rotator'); } ?>
+
+				<p class="submit">
+					<input type="button" id="testimonial-rotator-insert-download" class="button-primary" value="<?php echo __( 'Insert Rotator', 'testimonial_rotator' ); ?>" onclick="insertTestimonialRotator();" />
+					<a id="testimonial-rotator-cancel-add" class="button-secondary" onclick="tb_remove();" title="<?php _e( 'Cancel', 'testimonial_rotator' ); ?>"><?php _e( 'Cancel', 'testimonial_rotator' ); ?></a>
+				</p>
+			</div>
+		</div>
+	<?php
+	}
+}
+add_action( 'admin_footer', 'testimonial_rotator_admin_footer_for_thickbox' );

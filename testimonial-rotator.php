@@ -7,7 +7,7 @@ Author: Hal Gatewood
 Author URI: http://www.halgatewood.com
 Text Domain: testimonial_rotator
 Domain Path: /languages
-Version: 2.0.2
+Version: 2.0.3
 */
 
 
@@ -28,27 +28,30 @@ add_action( 'plugins_loaded', 'testimonial_rotator_setup' );
 function testimonial_rotator_setup() 
 {
 	add_action( 'init', 'testimonial_rotator_init' );
-	
-	add_action( 'add_meta_boxes', 'testimonial_rotator_create_metaboxes' );
-	add_action( 'save_post', 'testimonial_rotator_save_testimonial_meta', 1, 2 );
-	add_action( 'save_post', 'testimonial_rotator_save_rotator_meta', 1, 2 );
-	
-	add_filter( 'manage_edit-testimonial_columns', 'testimonial_rotator_columns' );
-	add_action( 'manage_testimonial_posts_custom_column', 'testimonial_rotator_add_columns' );
-	add_filter( 'manage_edit-testimonial_sortable_columns', 'testimonial_rotator_column_sort' );
-	
-	add_filter( 'manage_edit-testimonial_rotator_columns', 'testimonial_rotator_rotator_columns' );
-	add_action( 'manage_testimonial_rotator_posts_custom_column', 'testimonial_rotator_rotator_add_columns' );
-	
-	add_action( 'admin_head', 'testimonial_rotator_cpt_icon' );
-	add_action( 'admin_menu', 'register_testimonial_rotator_submenu_page' );
 	add_action( 'widgets_init', create_function('', 'return register_widget("TestimonialRotatorWidget");') );
 	add_action( 'wp_enqueue_scripts', 'testimonial_rotator_enqueue_scripts' );
-	
-	// ADDED 2.0
-	add_filter( 'enter_title_here', 'register_testimonial_form_title' );
 	add_filter( 'the_content', 'testimonial_rotator_single' );
-	add_action( 'admin_init', 'testimonial_rotator_settings_init' );
+	
+	// ADMIN ONLY HOOKS
+	if( is_admin() )
+	{
+		add_action( 'add_meta_boxes', 'testimonial_rotator_create_metaboxes' );
+		add_action( 'save_post', 'testimonial_rotator_save_testimonial_meta', 1, 2 );
+		add_action( 'save_post', 'testimonial_rotator_save_rotator_meta', 1, 2 );
+		
+		add_filter( 'manage_edit-testimonial_columns', 'testimonial_rotator_columns' );
+		add_action( 'manage_testimonial_posts_custom_column', 'testimonial_rotator_add_columns' );
+		add_filter( 'manage_edit-testimonial_sortable_columns', 'testimonial_rotator_column_sort' );
+		
+		add_filter( 'manage_edit-testimonial_rotator_columns', 'testimonial_rotator_rotator_columns' );
+		add_action( 'manage_testimonial_rotator_posts_custom_column', 'testimonial_rotator_rotator_add_columns' );
+		
+		add_action( 'admin_head', 'testimonial_rotator_cpt_icon' );
+		add_action( 'admin_menu', 'register_testimonial_rotator_submenu_page' );
+		
+		add_filter( 'enter_title_here', 'register_testimonial_form_title' );
+		add_action( 'admin_init', 'testimonial_rotator_settings_init' );
+	}
 }
 
 
@@ -126,7 +129,7 @@ function testimonial_rotator_init()
 					'hierarchical' 			=> false,
 					'menu_position' 		=> 26.6,
 					'exclude_from_search' 	=> true,
-					'supports' 				=> apply_filters( "testimonial_rotator_testimonial_supports", array( 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes' ) )
+					'supports' 				=> apply_filters( "testimonial_rotator_testimonial_supports", array( 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes', 'custom-fields' ) )
 					);
 					
 	register_post_type( 'testimonial', apply_filters( 'testimonial_rotator_pt_args', $args ) );
@@ -161,7 +164,7 @@ function testimonial_rotator_init()
 					'hierarchical' 			=> false,
 					'menu_position' 		=> 26.7,
 					'exclude_from_search' 	=> true,
-					'supports' 				=> apply_filters( "testimonial_rotator_supports", array( 'title' ) ),
+					'supports' 				=> apply_filters( "testimonial_rotator_supports", array( 'title', 'custom-fields' ) ),
 					'show_in_menu'  		=> 'edit.php?post_type=testimonial',
 					);
 					
@@ -255,6 +258,7 @@ function testimonial_rotator($atts)
 	$prev_next			= (isset($atts['prev_next'])) ? true : false;
 	$paged				= (isset($atts['paged'])) ? true : false;
 	$template_name		= (isset($atts['template'])) ? $atts['template'] : 'default';
+	$img_size			= (isset($atts['img_size'])) ? $atts['img_size'] : false;
 	
 	
 	// SET DEFAULT SETTINGS IF NOT SET
@@ -267,6 +271,7 @@ function testimonial_rotator($atts)
 	if(!$prev_next)			{ $prev_next 		= get_post_meta( $id, '_prevnext', true ); }
 	if(!$post_count)		{ $post_count 		= (int) get_post_meta( $id, '_limit', true ); }
 	if(!$template_name)		{ $template_name 	= get_post_meta( $id, '_template', true ); }
+	if(!$img_size)			{ $img_size 		= get_post_meta( $id, '_img_size', true ); }
 	if( $show_microdata )
 	{
 		$hide_microdata = get_post_meta( $id, '_hide_microdata', true );
@@ -279,6 +284,7 @@ function testimonial_rotator($atts)
 	$speed 			= round($speed * 1000);
 	$post_count     = (!$post_count) ? -1 : $post_count;
 	if( $format != "rotator" ) $prev_next = false;
+	if( !$img_size ) $img_size = 'thumbnail';
 	
 	
 	// IF ID, QUERY FOR JUST THAT ROTATOR
@@ -358,12 +364,15 @@ function testimonial_rotator($atts)
 	// SWIPE FILTER
 	$touch_swipe = apply_filters( 'testimonial_rotator_swipe', 'true' );
 	
+	// EXTRA DATA ATTRIBUTE FILTER
+	$extra_data_attributes = apply_filters( 'testimonial_rotator_data_attributes', '', $template_name, $id );
+	
 	$global_rating = 0;
 
 	if ( have_posts() )
 	{
 		echo "<div id=\"testimonial_rotator{$rotator_class_prefix}_wrap_{$id}\" class=\"testimonial_rotator{$rotator_class_prefix}_wrap{$extra_wrap_class}\">\n";
-		echo "	<div id=\"testimonial_rotator{$rotator_class_prefix}_{$id}\" class=\"testimonial_rotator hreview-aggregate{$rotator_class_prefix}{$cycle_class}\" data-cycletwo-timeout=\"{$timeout}\" data-cycletwo-speed=\"{$speed}\" data-cycletwo-pause-on-hover=\"{$pause_on_hover}\" {$centered} data-cycletwo-swipe=\"{$touch_swipe}\" data-cycletwo-fx=\"{$fx}\" data-cycletwo-auto-height=\"{$auto_height}\" {$prevnextdata}data-cycletwo-slides=\"{$div_selector}\">\n";
+		echo "	<div id=\"testimonial_rotator{$rotator_class_prefix}_{$id}\" class=\"testimonial_rotator hreview-aggregate{$rotator_class_prefix}{$cycle_class}\" data-cycletwo-timeout=\"{$timeout}\" data-cycletwo-speed=\"{$speed}\" data-cycletwo-pause-on-hover=\"{$pause_on_hover}\" {$centered} data-cycletwo-swipe=\"{$touch_swipe}\" data-cycletwo-fx=\"{$fx}\" data-cycletwo-auto-height=\"{$auto_height}\" {$prevnextdata}data-cycletwo-slides=\"{$div_selector}\" {$extra_data_attributes}>\n";
 		
 		do_action( 'testimonial_rotator_slides_before' );
 

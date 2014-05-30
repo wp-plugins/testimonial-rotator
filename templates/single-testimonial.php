@@ -14,7 +14,7 @@ echo "<div class=\"testimonial_rotator_single hreview itemreviewed item {$has_im
 // POST THUMBNAIL
 if ( $has_image )
 { 
-	echo "	<div class=\"testimonial_rotator_img img\">" . get_the_post_thumbnail( get_the_ID(), 'thumbnail') . "</div>\n"; 
+	echo "	<div class=\"testimonial_rotator_img img\">" . get_the_post_thumbnail( get_the_ID(), $img_size ) . "</div>\n"; 
 }
 
 // DESCRIPTION

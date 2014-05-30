@@ -41,12 +41,15 @@ function testimonial_rotator_metabox_effects()
 	$limit					= (int) get_post_meta( $post->ID, '_limit', true );
 	$itemreviewed			= get_post_meta( $post->ID, '_itemreviewed', true );
 	$template				= get_post_meta( $post->ID, '_template', true );
+	$img_size				= get_post_meta( $post->ID, '_img_size', true );
 	
 	$available_effects = array('fade', 'fadeout', 'scrollHorz', 'scrollVert', 'none');
+	$image_sizes = get_intermediate_image_sizes();
 	
 	if(!$timeout) 	{ $timeout = 5; }
 	if(!$speed) 	{ $speed = 1; }
 	if(!$template) 	{ $template = 'default'; }
+	if(!$img_size) 	{ $template = 'thumbnail'; }
 	?>
 	
 	<style>
@@ -67,6 +70,15 @@ function testimonial_rotator_metabox_effects()
 			<?php } ?>
 		</select>
 		<?php _e('Transition Effect', 'testimonial_rotator'); ?>
+	</p>
+	
+	<p>
+		<select name="img_size">
+			<?php foreach($image_sizes as $image_size) { ?>
+			<option value="<?php echo $image_size ?>" <?php if($image_size == $img_size) echo " SELECTED"; ?>><?php echo $image_size ?></option>
+			<?php } ?>
+		</select>
+		<?php _e('Image Size', 'testimonial_rotator'); ?>
 	</p>
 	
 	<p>
@@ -176,6 +188,7 @@ function testimonial_rotator_save_rotator_meta( $post_id, $post )
 		if ( isset( $_POST['limit'] ) ) 			{ update_post_meta( $post_id, '_limit', strip_tags( $_POST['limit'] ) ); }
 		if ( isset( $_POST['itemreviewed'] ) ) 		{ update_post_meta( $post_id, '_itemreviewed', strip_tags( $_POST['itemreviewed'] ) ); }
 		if ( isset( $_POST['template'] ) ) 			{ update_post_meta( $post_id, '_template', strip_tags( $_POST['template'] ) ); }
+		if ( isset( $_POST['img_size'] ) ) 			{ update_post_meta( $post_id, '_img_size', strip_tags( $_POST['img_size'] ) ); }
 		
 		update_post_meta( $post_id, '_shuffle', isset( $_POST['shuffle']) ? 1 : 0 );
 		update_post_meta( $post_id, '_verticalalign', isset( $_POST['verticalalign']) ? 1 : 0 );
