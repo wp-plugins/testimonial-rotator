@@ -7,7 +7,7 @@ Author: Hal Gatewood
 Author URI: http://www.halgatewood.com
 Text Domain: testimonial_rotator
 Domain Path: /languages
-Version: 2.0.3
+Version: 2.0.4
 */
 
 
@@ -30,7 +30,6 @@ function testimonial_rotator_setup()
 	add_action( 'init', 'testimonial_rotator_init' );
 	add_action( 'widgets_init', create_function('', 'return register_widget("TestimonialRotatorWidget");') );
 	add_action( 'wp_enqueue_scripts', 'testimonial_rotator_enqueue_scripts' );
-	add_filter( 'the_content', 'testimonial_rotator_single' );
 	
 	// ADMIN ONLY HOOKS
 	if( is_admin() )
@@ -58,8 +57,10 @@ function testimonial_rotator_setup()
 // DO THE CSS AND JS
 function testimonial_rotator_enqueue_scripts()
 {
-	wp_enqueue_script( 'cycletwo', plugins_url('/js/jquery.cycletwo.js', __FILE__), array('jquery') );
-	wp_enqueue_script( 'cycletwo-addons', plugins_url('/js/jquery.cycletwo.addons.js', __FILE__), array('jquery', 'cycletwo') );
+	$load_scripts_in_footer = apply_filters( 'testimonial_rotator_scripts_in_footer', false );
+
+	wp_enqueue_script( 'cycletwo', plugins_url('/js/jquery.cycletwo.js', __FILE__), array('jquery'), false, $load_scripts_in_footer );
+	wp_enqueue_script( 'cycletwo-addons', plugins_url('/js/jquery.cycletwo.addons.js', __FILE__), array('jquery', 'cycletwo'), false, $load_scripts_in_footer );
 	wp_enqueue_style( 'testimonial-rotator-style', plugins_url('/testimonial-rotator-style.css', __FILE__) ); 
 
 	$hide_font_awesome = get_option( 'testimonial-rotator-hide-fontawesome' );
@@ -127,7 +128,7 @@ function testimonial_rotator_init()
 					'capability_type' 		=> 'post',
 					'has_archive' 			=> true,
 					'hierarchical' 			=> false,
-					'menu_position' 		=> 26.6,
+					'menu_position' 		=> apply_filters( "testimonial_rotator_menu_position", 26.6),
 					'exclude_from_search' 	=> true,
 					'supports' 				=> apply_filters( "testimonial_rotator_testimonial_supports", array( 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes', 'custom-fields' ) )
 					);
@@ -287,6 +288,11 @@ function testimonial_rotator($atts)
 	if( !$img_size ) $img_size = 'thumbnail';
 	
 	
+	// FILTER AVAILABLE FOR PAUSE ON HOVER
+	// ONE PARAMETER PASSED IS THE ID OF THE ROTATOR
+	$pause_on_hover  = apply_filters('testimonial_rotator_hover', $pause_on_hover, $id );
+	
+	
 	// IF ID, QUERY FOR JUST THAT ROTATOR
 	$meta_query = array();
 	if( $id )
@@ -321,7 +327,7 @@ function testimonial_rotator($atts)
 	}
 							
 							
-	query_posts( apply_filters( 'testimonial_rotator_display_args', $testimonials_args ) );
+	query_posts( apply_filters( 'testimonial_rotator_display_args', $testimonials_args, $id ) );
 
 
 	// ROTATOR CLASSES
@@ -350,19 +356,19 @@ function testimonial_rotator($atts)
 		// PREV / NEXT FONT AWESOME ICONS, FILTER READY
 		if( $fx == "scrollVert")
 		{
-			$prev_fa_icon 	= apply_filters( 'testimonial_rotator_fa_icon_prev_vert', 'fa-chevron-down' );
-			$next_fa_icon 	= apply_filters( 'testimonial_rotator_fa_icon_next_vert', 'fa-chevron-up' );
+			$prev_fa_icon 	= apply_filters( 'testimonial_rotator_fa_icon_prev_vert', 'fa-chevron-down', $id );
+			$next_fa_icon 	= apply_filters( 'testimonial_rotator_fa_icon_next_vert', 'fa-chevron-up', $id );
 		}
 		else
 		{
-			$prev_fa_icon 	= apply_filters( 'testimonial_rotator_fa_icon_prev', 'fa-chevron-left' );
-			$next_fa_icon 	= apply_filters( 'testimonial_rotator_fa_icon_next', 'fa-chevron-right' );
+			$prev_fa_icon 	= apply_filters( 'testimonial_rotator_fa_icon_prev', 'fa-chevron-left', $id );
+			$next_fa_icon 	= apply_filters( 'testimonial_rotator_fa_icon_next', 'fa-chevron-right', $id );
 		}
 	}
 	
 	
 	// SWIPE FILTER
-	$touch_swipe = apply_filters( 'testimonial_rotator_swipe', 'true' );
+	$touch_swipe = apply_filters( 'testimonial_rotator_swipe', 'true', $id );
 	
 	// EXTRA DATA ATTRIBUTE FILTER
 	$extra_data_attributes = apply_filters( 'testimonial_rotator_data_attributes', '', $template_name, $id );
@@ -532,6 +538,11 @@ class TestimonialRotatorWidget extends WP_Widget
 		
 		$instance['id'] 			= $instance['rotator_id'];
 		$instance['is_widget'] 		= true;
+		
+		
+		// HOOK INTO A WIDGET BEFORE IT GETS LOADED
+		apply_filters( 'testimonial_rotator_pre_widget_instance', $instance, $instance['rotator_id']);
+		
 		testimonial_rotator( $instance );
 		
 		echo $after_widget;

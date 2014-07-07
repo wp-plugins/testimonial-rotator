@@ -66,6 +66,15 @@ When you are adding or editing the rotator, you have the ability to specify how 
 
 == Changelog ==
 
+
+= 2.0.4 - Updated July 7, 2014 =
+* Ability to center the stars
+* Hopefully fixed up issues with the_content on the single page
+* Added new filter for pause on hover
+* Added new filter for loading scripts in the footer
+* Added new filter for settings on Widgets
+* Added Rotator IDs to most filters so they can used on a rotator basis
+
 = 2.0.3 - Updated May 30, 2014 =
 * Added thumbnail setting for Rotator
 * Wrapped Init functions with is_admin for the Admin only hooks

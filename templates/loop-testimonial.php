@@ -21,7 +21,7 @@ if($rating)
 	echo "<div class=\"testimonial_rotator_stars cf-tr\">\n";
 	for($r=1; $r <= $rating; $r++)
 	{
-		echo "	<div class=\"testimonial_rotator_star testimonial_rotator_star_$r\"><i class=\"fa fa-star\"></i></div>";
+		echo "	<span class=\"testimonial_rotator_star testimonial_rotator_star_$r\"><i class=\"fa fa-star\"></i></span>";
 	}
 	echo "</div>\n";
 }

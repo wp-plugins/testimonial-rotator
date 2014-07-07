@@ -25,6 +25,11 @@ function testimonial_rotator_single( $content )
 	return $content;
 }
 
+if( !is_admin() )
+{
+	add_filter( 'the_content', 'testimonial_rotator_single' );
+}
+
 
 
 // READ MORE, WHEN EXCERPT IT USED
