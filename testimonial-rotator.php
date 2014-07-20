@@ -7,7 +7,7 @@ Author: Hal Gatewood
 Author URI: http://www.halgatewood.com
 Text Domain: testimonial_rotator
 Domain Path: /languages
-Version: 2.0.4
+Version: 2.0.5
 */
 
 
@@ -68,7 +68,7 @@ function testimonial_rotator_enqueue_scripts()
 
 	if( !$hide_font_awesome )
 	{
-		wp_enqueue_style( 'font-awesome', '//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css' );
+		wp_enqueue_style( 'font-awesome', '//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css' );
 	}
 }
 
@@ -281,16 +281,23 @@ function testimonial_rotator($atts)
 	
 	
 	// SANATIZE SETTINGS
+	if(!$timeout) 	{ $timeout = 5; }
+	if(!$speed) 	{ $speed = 1; }
 	$timeout 		= round($timeout * 1000);
 	$speed 			= round($speed * 1000);
 	$post_count     = (!$post_count) ? -1 : $post_count;
 	if( $format != "rotator" ) $prev_next = false;
 	if( !$img_size ) $img_size = 'thumbnail';
+	if( $format == "list" AND $prev_next ) { $paged = true; }
 	
 	
 	// FILTER AVAILABLE FOR PAUSE ON HOVER
 	// ONE PARAMETER PASSED IS THE ID OF THE ROTATOR
 	$pause_on_hover  = apply_filters('testimonial_rotator_hover', $pause_on_hover, $id );
+	
+	
+	// STAR ICON
+	$testimonial_rotator_star 	= apply_filters( 'testimonial_rotator_star', 'fa-star', $template_name, $id );
 	
 	
 	// IF ID, QUERY FOR JUST THAT ROTATOR
@@ -371,7 +378,7 @@ function testimonial_rotator($atts)
 	$touch_swipe = apply_filters( 'testimonial_rotator_swipe', 'true', $id );
 	
 	// EXTRA DATA ATTRIBUTE FILTER
-	$extra_data_attributes = apply_filters( 'testimonial_rotator_data_attributes', '', $template_name, $id );
+	$extra_data_attributes 		= apply_filters( 'testimonial_rotator_data_attributes', '', $template_name, $id );
 	
 	$global_rating = 0;
 

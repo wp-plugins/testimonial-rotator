@@ -66,6 +66,10 @@ When you are adding or editing the rotator, you have the ability to specify how 
 
 == Changelog ==
 
+= 2.0.5 - Updated July 20, 2014 =
+* New filter to change the stars to any FontAwesome Icon
+* Improved stability when upgrading from 1.4+
+* When 'Previous/Next' is checked in the rotator it will automatically turn on paged for the list view
 
 = 2.0.4 - Updated July 7, 2014 =
 * Ability to center the stars
