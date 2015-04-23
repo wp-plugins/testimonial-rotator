@@ -3,7 +3,7 @@ Contributors: halgatewood
 Donate link: http://halgatewood.com/donate/
 Tags: testimonials, sidebar, shortcode, testimonial, praise, homage, testimony, witness, appreciation, green light, rotator, rotators, for developers
 Requires at least: 3.5
-Tested up to: 4.0
+Tested up to: 4.2
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
