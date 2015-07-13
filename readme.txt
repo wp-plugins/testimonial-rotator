@@ -3,7 +3,7 @@ Contributors: halgatewood
 Donate link: http://halgatewood.com/donate/
 Tags: testimonials, sidebar, shortcode, testimonial, praise, homage, testimony, witness, appreciation, green light, rotator, rotators, for developers
 Requires at least: 3.5
-Tested up to: 4.2
+Tested up to: 4.3
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -11,7 +11,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Easily add Testimonials to your WordPress Blog or Company Website.
 
 == Description ==
-Finally a really simple way to manage testimonials on your site. This plugin creates a testimonial and a testimonial rotator custom post type, complete with WordPress admin fields for adding testimonials and assigning them to rotators for display. It includes a Widget and Shortcode to display the testimonials. 
+Finally a really simple way to manage testimonials on your site. This plugin creates a testimonial and a testimonial rotator custom post type, complete with WordPress admin fields for adding testimonials and assigning them to rotators for display. It includes a Widget and Shortcode to display the testimonials.
 
 = Documentation =
 Help documents and code snippets can be viewed at http://halgatewood.com/docs/plugins/testimonial-rotator/
@@ -65,6 +65,9 @@ When you are adding or editing the rotator, you have the ability to specify how 
 
 
 == Changelog ==
+
+= 2.0.6 - Updated July 13, 2015 =
+* Changed WP_Widget() to __construct, for maximum PHP5 support
 
 = 2.0.5 - Updated July 20, 2014 =
 * New filter to change the stars to any FontAwesome Icon
