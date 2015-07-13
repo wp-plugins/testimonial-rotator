@@ -7,7 +7,7 @@ Author: Hal Gatewood
 Author URI: http://www.halgatewood.com
 Text Domain: testimonial_rotator
 Domain Path: /languages
-Version: 2.0.5
+Version: 2.0.6
 */
 
 
@@ -470,7 +470,7 @@ class TestimonialRotatorWidget extends WP_Widget
 	function TestimonialRotatorWidget()
 	{
 		$widget_ops = array('classname' => 'TestimonialRotatorWidget', 'description' => __('Displays rotating testimonials', 'testimonial_rotator') );
-		$this->WP_Widget('TestimonialRotatorWidget', __('Testimonials Rotator', 'testimonial_rotator'), $widget_ops);
+		parent::__construct('TestimonialRotatorWidget', __('Testimonials Rotator', 'testimonial_rotator'), $widget_ops);
 	}
  
 	function form($instance)
