@@ -26,7 +26,7 @@ Version 2 includes a big release full of awesome features like:
 * Star Ratings
 * Author information field
 * Testimonial single template
-* Ability to make custom templates (PRO Theme Pack coming soon)
+* Ability to make custom templates (Themes coming August 2015)
 * hReview Support
 * Pagination in List Format
 * Ability to show the Add Rotator section based on User Role
